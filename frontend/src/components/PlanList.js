@@ -16,7 +16,7 @@ const PlanList = () => {
   });
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/plans/')
+    axios.get('https://emmanuel-worship-backend.onrender.com//api/plans/')
       .then(response => setPlans(response.data))
       .catch(error => console.error('There was an error fetching the plans!', error));
   }, []);

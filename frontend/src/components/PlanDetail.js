@@ -10,7 +10,7 @@ const PlanDetail = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/plans/${id}/`)
+    axios.get(`https://emmanuel-worship-backend.onrender.com//api/plans/${id}/`)
       .then(response => setPlan(response.data))
       .catch(error => console.error('There was an error fetching the plan!', error));
   }, [id]);
@@ -20,7 +20,7 @@ const PlanDetail = () => {
   };
 
   const downloadConcatenatedPowerpoint = () => {
-    axios.get(`http://localhost:8000/api/plans/${id}/download-concatenated-powerpoint/`, { responseType: 'blob' })
+    axios.get(`https://emmanuel-worship-backend.onrender.com//api/plans/${id}/download-concatenated-powerpoint/`, { responseType: 'blob' })
       .then(response => {
         const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }));
         const link = document.createElement('a');

@@ -9,7 +9,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:8000/api/login/', { username, password })
+    axios.post('https://emmanuel-worship-backend.onrender.com//api/login/', { username, password })
       .then(response => {
         localStorage.setItem('token', response.data.token);
         history.push('/create-plan');

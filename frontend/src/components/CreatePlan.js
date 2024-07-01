@@ -18,17 +18,17 @@ const CreatePlan = () => {
 
   useEffect(() => {
     // Fetch all musicians
-    axios.get('http://localhost:8000/api/musicians/')
+    axios.get('https://emmanuel-worship-backend.onrender.com//api/musicians/')
       .then(response => setAllMusicians(response.data))
       .catch(error => console.error('There was an error fetching the musicians!', error));
 
     // Fetch all singers
-    axios.get('http://localhost:8000/api/singers/')
+    axios.get('https://emmanuel-worship-backend.onrender.com//api/singers/')
       .then(response => setAllSingers(response.data))
       .catch(error => console.error('There was an error fetching the singers!', error));
 
     // Fetch all songs
-    axios.get('http://localhost:8000/api/songs/')
+    axios.get('https://emmanuel-worship-backend.onrender.com//api/songs/')
       .then(response => setAllSongs(response.data))
       .catch(error => console.error('There was an error fetching the songs!', error));
   }, []);
@@ -61,7 +61,7 @@ const CreatePlan = () => {
 
     console.log('Plan data to be sent:', planData);
 
-    axios.post('http://localhost:8000/api/plans/', planData)
+    axios.post('https://emmanuel-worship-backend.onrender.com//api/plans/', planData)
       .then(() => {
         navigate('/plans');
       })
