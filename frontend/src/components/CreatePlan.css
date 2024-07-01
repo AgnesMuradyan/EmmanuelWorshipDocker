@@ -1,0 +1,168 @@
+body {
+  background-color: #E6E6FA; /* Very light purple background for the entire page */
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial, sans-serif';
+}
+
+.create-plan {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.create-plan h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.create-plan .form-group {
+  margin-bottom: 15px;
+}
+
+.create-plan .form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #555;
+}
+
+.create-plan .form-group input,
+.create-plan .form-group select {
+  width: calc(100% - 22px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.create-plan .form-group .song-group {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.create-plan .form-group .song-group select {
+  flex: 1;
+}
+
+.create-plan .form-group .song-group button {
+  padding: 10px;
+  background-color: #ff6666;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.create-plan .form-group .song-group button:hover {
+  background-color: #ff3333;
+}
+
+.create-plan .form-group button[type="button"] {
+  padding: 10px 15px;
+  background-color: #66b3ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.create-plan .form-group button[type="button"]:hover {
+  background-color: #3399ff;
+}
+
+.create-plan button[type="submit"] {
+  width: 100%;
+  padding: 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+.create-plan button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #003366;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-bottom: 20
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 40px;
+  margin-right: 10px;
+  color: #ffffff;
+}
+
+.brand-name {
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+.menu-icon {
+  font-size: 1.5rem;
+  color: #ffffff;
+  cursor: pointer;
+  display: none;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 1.2rem;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.nav-link:hover {
+  background-color: #00509E;
+  text-decoration: none;
+}
+
+@media (max-width: 768px) {
+  .menu-icon {
+    display: block;
+  }
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    background-color: #003366;
+    position: absolute;
+    top: 60px;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  .nav-links.active {
+    display: flex;
+  }
+}
