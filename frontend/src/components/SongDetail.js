@@ -10,7 +10,7 @@ const SongDetail = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(`https://emmanuel-worship-backend.onrender.com//api/songs/${id}/`)
+    axios.get(`https://emmanuel-worship-backend.onrender.com/api/songs/${id}/`)
       .then(response => setSong(response.data))
       .catch(error => console.error('There was an error fetching the song!', error));
   }, [id]);
@@ -22,7 +22,7 @@ const SongDetail = () => {
   };
 
   const downloadChords = () => {
-    axios.get(`https://emmanuel-worship-backend.onrender.com//api/songs/${id}/view-chords/`, { responseType: 'blob' })
+    axios.get(`https://emmanuel-worship-backend.onrender.com/api/songs/${id}/view-chords/`, { responseType: 'blob' })
       .then(response => {
         const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
         const link = document.createElement('a');
@@ -36,7 +36,7 @@ const SongDetail = () => {
   };
 
   const downloadPowerpoint = () => {
-    axios.get(`https://emmanuel-worship-backend.onrender.com//api/songs/${id}/view-powerpoint/`, { responseType: 'blob' })
+    axios.get(`https://emmanuel-worship-backend.onrender.com/api/songs/${id}/view-powerpoint/`, { responseType: 'blob' })
       .then(response => {
         const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }));
         const link = document.createElement('a');
@@ -87,7 +87,7 @@ const SongDetail = () => {
           {song.chords ? (
               <div className="chords-container">
                   <iframe
-                      src={`https://emmanuel-worship-backend.onrender.com//api/songs/${id}/view-chords/`}
+                      src={`https://emmanuel-worship-backend.onrender.com/api/songs/${id}/view-chords/`}
                       className="chords-iframe"
                       title="Chords"
                       frameBorder="0"

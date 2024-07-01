@@ -6,7 +6,7 @@ const SongSelection = ({ planId }) => {
   const [selectedSongs, setSelectedSongs] = useState([]);
 
   useEffect(() => {
-    axios.get('https://emmanuel-worship-backend.onrender.com//api/songs/')
+    axios.get('https://emmanuel-worship-backend.onrender.com/api/songs/')
       .then(response => setSongs(response.data))
       .catch(error => console.error('There was an error fetching the songs!', error));
   }, []);
@@ -21,7 +21,7 @@ const SongSelection = ({ planId }) => {
       order: index,
     }));
 
-    axios.put(`https://emmanuel-worship-backend.onrender.com//api/plans/${planId}/`, {
+    axios.put(`https://emmanuel-worship-backend.onrender.com/api/plans/${planId}/`, {
       songs: songsData
     })
       .then(response => console.log('Songs saved successfully!', response))

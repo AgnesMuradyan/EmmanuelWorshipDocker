@@ -11,7 +11,7 @@ const SongList = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    axios.get('https://emmanuel-worship-backend.onrender.com//api/songs/')
+    axios.get('https://emmanuel-worship-backend.onrender.com/api/songs/')
       .then(response => {
         console.log('API response:', response.data);  // Debugging line
         setSongs(response.data);
