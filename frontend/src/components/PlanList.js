@@ -16,7 +16,7 @@ const PlanList = () => {
   });
 
   useEffect(() => {
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/plans/')
+    axios.get('http://localhost:8000/api/plans/')
       .then(response => setPlans(response.data))
       .catch(error => console.error('There was an error fetching the plans!', error));
   }, []);
@@ -47,6 +47,19 @@ const PlanList = () => {
         return updatedFilter;
       });
     }
+  };
+
+  const monthNames = [
+    'Հունվար', 'Փետրվար', 'Մարտ', 'Ապրիլ', 'Մայիս', 'Հունիս',
+    'Հուլիս', 'Օգոստոս', 'Սեպտեմբեր', 'Հոկտեմբեր', 'Նոյեմբեր', 'Դեկտեմբեր'
+  ];
+
+  const formatDate = dateString => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+    return `${day} ${month}, ${year}`;
   };
 
   const filteredPlans = plans.filter(plan =>
@@ -122,7 +135,7 @@ const PlanList = () => {
         <ul className="plan-list">
             {filteredPlans.map(plan => (
                 <li key={plan.id} className="plan-item">
-                    <Link to={`/plans/${plan.id}`} className="plan-link">{plan.date}</Link>
+                    <Link to={`/plans/${plan.id}`} className="plan-link">{formatDate(plan.date)}</Link>
                 </li>
             ))}
         </ul>

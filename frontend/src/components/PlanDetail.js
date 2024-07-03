@@ -83,7 +83,7 @@ const PlanDetail = () => {
           </div>
 
           <div className="section">
-              <h2 className="section-title">Songs</h2>
+              <h2 className="section-title">Երգեր</h2>
               <ul className="list">
                   {sortedSongs.map(planSong => (
                       <li key={planSong.id} className="list-item">
