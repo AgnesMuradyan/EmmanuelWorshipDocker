@@ -9,6 +9,7 @@ import SongSelection from './components/SongSelection';
 const App = () => (
   <Router>
     <Routes>
+      <Route path="/" element={<SongList />} />
       <Route path="/songs" element={<SongList />} />
       <Route path="/songs/:id" element={<SongDetail />} />
       <Route path="/plans" element={<PlanList />} />
