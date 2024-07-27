@@ -9,16 +9,14 @@ const SongList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
   useEffect(() => {
-    axios.get(`${apiUrl}/api/songs/`)
+    axios.get('https://emmanuel-worship-backend.onrender.com/api/songs/')
       .then(response => {
         console.log('API response:', response.data);  // Debugging line
         setSongs(response.data);
       })
       .catch(error => console.error('There was an error fetching the songs!', error));
-  }, [apiUrl]);
+  }, []);
 
   const handleSearch = event => {
     setSearchTerm(event.target.value);
