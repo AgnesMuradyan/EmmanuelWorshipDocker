@@ -16,22 +16,24 @@ const CreatePlan = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
   useEffect(() => {
     // Fetch all musicians
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/musicians/')
+    axios.get(`${apiUrl}/api/musicians`)
       .then(response => setAllMusicians(response.data))
       .catch(error => console.error('There was an error fetching the musicians!', error));
 
     // Fetch all singers
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/singers/')
+    axios.get(`${apiUrl}/api/singers`)
       .then(response => setAllSingers(response.data))
       .catch(error => console.error('There was an error fetching the singers!', error));
 
     // Fetch all songs
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/songs/')
+    axios.get(`${apiUrl}/api/songs`)
       .then(response => setAllSongs(response.data))
       .catch(error => console.error('There was an error fetching the songs!', error));
-  }, []);
+  }, [apiUrl]);
 
   const handleAddSong = () => {
     setSongs([...songs, { song_id: '', order: songs.length + 1 }]);
@@ -61,7 +63,7 @@ const CreatePlan = () => {
 
     console.log('Plan data to be sent:', planData);
 
-    axios.post('https://emmanuel-worship-backend.onrender.com/api/plans/', planData)
+    axios.post(`${apiUrl}/api/plans`, planData)
       .then(() => {
         navigate('/plans');
       })
