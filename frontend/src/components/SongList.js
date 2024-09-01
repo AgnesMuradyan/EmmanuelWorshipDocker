@@ -66,7 +66,7 @@ const SongList = () => {
         className="search-input"
       />
       {filteredSongs.length === 0 && (
-        <p className="no-songs-message">No songs found.</p>
+        <p className="no-songs-message">Երգերը բեռնվում են...</p>
       )}
       <ul className="song-list">
         {currentSongs.map(song => (
