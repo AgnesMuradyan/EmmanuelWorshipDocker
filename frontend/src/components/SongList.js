@@ -9,6 +9,9 @@ const SongList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const songsPerPage = 15;
+
   useEffect(() => {
     axios.get('https://emmanuel-worship-backend.onrender.com/api/songs/')
       .then(response => {
@@ -20,6 +23,16 @@ const SongList = () => {
 
   const handleSearch = event => {
     setSearchTerm(event.target.value);
+  };
+
+  const indexOfLastSong = currentPage * songsPerPage;
+  const indexOfFirstSong = indexOfLastSong - songsPerPage;
+  const currentSongs = filteredSongs.slice(indexOfFirstSong, indexOfLastSong);
+
+  const totalPages = Math.ceil(filteredSongs.length / songsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   const toggleMenu = () => {
