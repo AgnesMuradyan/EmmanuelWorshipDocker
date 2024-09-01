@@ -14,6 +14,8 @@ const PlanList = () => {
     SU: false,
     OT: false,
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const plansPerPage = 15;
 
   useEffect(() => {
     axios.get('https://emmanuel-worship-backend.onrender.com/api/plans/')
@@ -67,6 +69,16 @@ const PlanList = () => {
     (dayTypeFilter.ALL || dayTypeFilter[plan.day_type])
   );
 
+  const indexOfLastPlan = currentPage * plansPerPage;
+  const indexOfFirstPlan = indexOfLastPlan - plansPerPage;
+  const currentPlans = filteredPlans.slice(indexOfFirstPlan, indexOfLastPlan);
+
+  const totalPages = Math.ceil(filteredPlans.length / plansPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
@@ -94,51 +106,62 @@ const PlanList = () => {
         onChange={handleSearch}
         className="search-input"
       />
-        <div className="filters">
-            <label>
-                <input
-                    type="checkbox"
-                    name="ALL"
-                    checked={dayTypeFilter.ALL}
-                    onChange={handleDayTypeChange}
-                />
-                Բոլորը
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="SU"
-                    checked={dayTypeFilter.SU}
-                    onChange={handleDayTypeChange}
-                />
-                Կիրակի
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="TH"
-                    checked={dayTypeFilter.TH}
-                    onChange={handleDayTypeChange}
-                />
-                Հինգշաբթի
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="OT"
-                    checked={dayTypeFilter.OT}
-                    onChange={handleDayTypeChange}
-                />
-                Այլ
-            </label>
-        </div>
-        <ul className="plan-list">
-            {filteredPlans.map(plan => (
-                <li key={plan.id} className="plan-item">
-                    <Link to={`/plans/${plan.id}`} className="plan-link">{formatDate(plan.date)}</Link>
-                </li>
-            ))}
-        </ul>
+      <div className="filters">
+        <label>
+          <input
+            type="checkbox"
+            name="ALL"
+            checked={dayTypeFilter.ALL}
+            onChange={handleDayTypeChange}
+          />
+          Բոլորը
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="SU"
+            checked={dayTypeFilter.SU}
+            onChange={handleDayTypeChange}
+          />
+          Կիրակի
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="TH"
+            checked={dayTypeFilter.TH}
+            onChange={handleDayTypeChange}
+          />
+          Հինգշաբթի
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="OT"
+            checked={dayTypeFilter.OT}
+            onChange={handleDayTypeChange}
+          />
+          Այլ
+        </label>
+      </div>
+      <ul className="plan-list">
+        {currentPlans.map(plan => (
+          <li key={plan.id} className="plan-item">
+            <Link to={`/plans/${plan.id}`} className="plan-link">{formatDate(plan.date)}</Link>
+          </li>
+        ))}
+      </ul>
+      <div className="pagination">
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={`page-button ${index + 1 === currentPage ? 'active' : ''}`}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
