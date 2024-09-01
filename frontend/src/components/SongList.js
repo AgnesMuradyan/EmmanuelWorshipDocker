@@ -8,7 +8,6 @@ const SongList = () => {
   const [songs, setSongs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-
   const [currentPage, setCurrentPage] = useState(1);
   const songsPerPage = 15;
 
@@ -25,6 +24,10 @@ const SongList = () => {
     setSearchTerm(event.target.value);
   };
 
+  const filteredSongs = songs
+    .filter(song => song.title.toLowerCase().includes(searchTerm.toLowerCase()))
+    .sort((a, b) => a.title.localeCompare(b.title));  // Sort alphabetically
+
   const indexOfLastSong = currentPage * songsPerPage;
   const indexOfFirstSong = indexOfLastSong - songsPerPage;
   const currentSongs = filteredSongs.slice(indexOfFirstSong, indexOfLastSong);
@@ -38,10 +41,6 @@ const SongList = () => {
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
-
-  const filteredSongs = songs
-    .filter(song => song.title.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => a.title.localeCompare(b.title));  // Sort alphabetically
 
   return (
     <div className="song-list-container">
@@ -67,15 +66,26 @@ const SongList = () => {
         className="search-input"
       />
       {filteredSongs.length === 0 && (
-        <p className="no-songs-message">No songs found.</p>
-      )} {/* Display message if no songs found */}
+        <p className="no-songs-message">Երգերը բեռնվում են...</p>
+      )}
       <ul className="song-list">
-        {filteredSongs.map(song => (
+        {currentSongs.map(song => (
           <li key={song.id} className="song-item">
             <Link to={`/songs/${song.id}`} className="song-link">{song.title}</Link>
           </li>
         ))}
       </ul>
+      <div className="pagination">
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={`page-button ${index + 1 === currentPage ? 'active' : ''}`}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
