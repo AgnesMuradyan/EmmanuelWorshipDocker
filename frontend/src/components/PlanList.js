@@ -14,6 +14,8 @@ const PlanList = () => {
     SU: false,
     OT: false,
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const plansPerPage = 15;
 
   useEffect(() => {
     axios.get('https://emmanuel-worship-backend.onrender.com/api/plans/')
@@ -68,6 +70,16 @@ const PlanList = () => {
       (dayTypeFilter.ALL || dayTypeFilter[plan.day_type])
     )
     .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by newest first
+
+  const indexOfLastPlan = currentPage * plansPerPage;
+  const indexOfFirstPlan = indexOfLastPlan - plansPerPage;
+  const currentPlans = filteredPlans.slice(indexOfFirstPlan, indexOfLastPlan);
+
+  const totalPages = Math.ceil(filteredPlans.length / plansPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -141,6 +153,17 @@ const PlanList = () => {
           </li>
         ))}
       </ul>
+      <div className="pagination">
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={`page-button ${index + 1 === currentPage ? 'active' : ''}`}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
