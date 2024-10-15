@@ -36,16 +36,16 @@ services:
     environment:
       - DATABASE_URL=postgres://myuser:mypassword@db:5432/myproject
     ports:
-      - "8000:8000"
+      - "8009:8009"
     command: >
       sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8002"
+             python manage.py runserver 0.0.0.0:8009"
 
   ngrok:
     image: wernight/ngrok
     environment:
       - NGROK_AUTHTOKEN=your_ngrok_auth_token  # Replace with your ngrok auth token
-      - NGROK_PORT=backend:8002  # This points ngrok to your Django backend
+      - NGROK_PORT=backend:8009  # This points ngrok to your Django backend
 
 
 volumes:
