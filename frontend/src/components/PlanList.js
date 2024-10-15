@@ -64,10 +64,12 @@ const PlanList = () => {
     return `${day} ${month}, ${year}`;
   };
 
-  const filteredPlans = plans.filter(plan =>
-    plan.date.includes(searchTerm) &&
-    (dayTypeFilter.ALL || dayTypeFilter[plan.day_type])
-  );
+  const filteredPlans = plans
+    .filter(plan =>
+      plan.date.includes(searchTerm) &&
+      (dayTypeFilter.ALL || dayTypeFilter[plan.day_type])
+    )
+    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by newest first
 
   const indexOfLastPlan = currentPage * plansPerPage;
   const indexOfFirstPlan = indexOfLastPlan - plansPerPage;
@@ -145,7 +147,7 @@ const PlanList = () => {
         </label>
       </div>
       <ul className="plan-list">
-        {currentPlans.map(plan => (
+        {filteredPlans.map(plan => (
           <li key={plan.id} className="plan-item">
             <Link to={`/plans/${plan.id}`} className="plan-link">{formatDate(plan.date)}</Link>
           </li>
