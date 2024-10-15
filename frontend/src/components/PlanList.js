@@ -62,10 +62,12 @@ const PlanList = () => {
     return `${day} ${month}, ${year}`;
   };
 
-  const filteredPlans = plans.filter(plan =>
-    plan.date.includes(searchTerm) &&
-    (dayTypeFilter.ALL || dayTypeFilter[plan.day_type])
-  );
+  const filteredPlans = plans
+    .filter(plan =>
+      plan.date.includes(searchTerm) &&
+      (dayTypeFilter.ALL || dayTypeFilter[plan.day_type])
+    )
+    .sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort by newest first
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
@@ -94,51 +96,51 @@ const PlanList = () => {
         onChange={handleSearch}
         className="search-input"
       />
-        <div className="filters">
-            <label>
-                <input
-                    type="checkbox"
-                    name="ALL"
-                    checked={dayTypeFilter.ALL}
-                    onChange={handleDayTypeChange}
-                />
-                Բոլորը
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="SU"
-                    checked={dayTypeFilter.SU}
-                    onChange={handleDayTypeChange}
-                />
-                Կիրակի
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="TH"
-                    checked={dayTypeFilter.TH}
-                    onChange={handleDayTypeChange}
-                />
-                Հինգշաբթի
-            </label>
-            <label>
-                <input
-                    type="checkbox"
-                    name="OT"
-                    checked={dayTypeFilter.OT}
-                    onChange={handleDayTypeChange}
-                />
-                Այլ
-            </label>
-        </div>
-        <ul className="plan-list">
-            {filteredPlans.map(plan => (
-                <li key={plan.id} className="plan-item">
-                    <Link to={`/plans/${plan.id}`} className="plan-link">{formatDate(plan.date)}</Link>
-                </li>
-            ))}
-        </ul>
+      <div className="filters">
+        <label>
+          <input
+            type="checkbox"
+            name="ALL"
+            checked={dayTypeFilter.ALL}
+            onChange={handleDayTypeChange}
+          />
+          Բոլորը
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="SU"
+            checked={dayTypeFilter.SU}
+            onChange={handleDayTypeChange}
+          />
+          Կիրակի
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="TH"
+            checked={dayTypeFilter.TH}
+            onChange={handleDayTypeChange}
+          />
+          Հինգշաբթի
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="OT"
+            checked={dayTypeFilter.OT}
+            onChange={handleDayTypeChange}
+          />
+          Այլ
+        </label>
+      </div>
+      <ul className="plan-list">
+        {filteredPlans.map(plan => (
+          <li key={plan.id} className="plan-item">
+            <Link to={`/plans/${plan.id}`} className="plan-link">{formatDate(plan.date)}</Link>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
