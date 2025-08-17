@@ -14,12 +14,24 @@ const SongList = () => {
   const songsPerPage = 15;
 
   useEffect(() => {
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/songs/')
-      .then(response => {
-        setSongs(response.data || []);
-      })
-      .catch(error => console.error('There was an error fetching the songs!', error))
-      .finally(() => setLoading(false));
+    const fetchAll = async () => {
+      try {
+        let url = 'https://emmanuel-worship-backend.onrender.com/api/songs/';
+        const all = [];
+        while (url) {
+          const { data } = await axios.get(url);
+          const chunk = Array.isArray(data) ? data : (data?.results ?? []);
+          all.push(...chunk);
+          url = data?.next ?? null; // follow DRF pagination if present
+        }
+        setSongs(all);
+      } catch (error) {
+        console.error('There was an error fetching the songs!', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAll();
   }, []);
 
   // Reset page when search term changes
@@ -31,11 +43,12 @@ const SongList = () => {
   const toggleMenu = () => setMenuOpen(o => !o);
 
   const filteredSongs = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
+    const term = (searchTerm || '').trim().toLowerCase();
+    const source = Array.isArray(songs) ? songs : [];
     const base = term
-      ? songs.filter(song => (song.title || '').toLowerCase().includes(term))
-      : songs;
-    return [...base].sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+      ? source.filter(song => (song?.title ?? '').toLowerCase().includes(term))
+      : source;
+    return base.slice().sort((a, b) => (a?.title ?? '').localeCompare(b?.title ?? ''));
   }, [songs, searchTerm]);
 
   const totalPages = Math.ceil(filteredSongs.length / songsPerPage) || 1;
@@ -45,7 +58,6 @@ const SongList = () => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    // smooth scroll to top of list on change
     const container = document.querySelector('.song-list-container');
     if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
     else window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -107,8 +119,8 @@ const SongList = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
-        siblingCount={1}     // tweak for wider middle window
-        boundaryCount={1}    // show 1 page at each edge
+        siblingCount={1}
+        boundaryCount={1}
       />
     </div>
   );
