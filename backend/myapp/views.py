@@ -14,7 +14,10 @@ from .serializers import (
 )
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
-
+from rest_framework import viewsets
+from rest_framework.filters import SearchFilter, OrderingFilter
+from .models import Song
+from .serializers import SongSerializer
 
 def index(request):
     return render(request, 'index.html')
@@ -26,8 +29,11 @@ class AlbumViewSet(viewsets.ModelViewSet):
 
 
 class SongViewSet(viewsets.ModelViewSet):
-    queryset = Song.objects.all()
+    queryset = Song.objects.all().order_by("title")
     serializer_class = SongSerializer
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ["title", "album__title"]  # ?search=...
+    ordering_fields = ["title", "created_at", "id"]  # ?ordering=title
 
     @action(detail=True, methods=['get'], url_path='view-chords', url_name='view_chords')
     def view_chords(self, request, pk=None):
@@ -51,6 +57,23 @@ class SongViewSet(viewsets.ModelViewSet):
 class PlanViewSet(viewsets.ModelViewSet):
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
+    filter_backends = [OrderingFilter]
+    ordering_fields = ["date", "id", "day_type"]
+    ordering = ["-date", "-id"]
+
+    def get_queryset(self):
+        qs = super().get_queryset()  # uses the queryset above
+
+        date_val = self.request.query_params.get("date")
+        if date_val:
+            qs = qs.filter(date=date_val)
+
+        dt_csv = self.request.query_params.get("day_type")
+        if dt_csv:
+            wanted = [v.strip().upper() for v in dt_csv.split(",") if v.strip()]
+            qs = qs.filter(day_type__in=wanted)
+
+        return qs
 
     @action(detail=True, methods=['get'], url_path='view-songs', url_name='view_songs')
     def view_songs(self, request, pk=None):
