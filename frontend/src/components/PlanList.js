@@ -2,69 +2,73 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './PlanList.css';
-import logo from './logo.png';
-import Pagination from './Pagination'; // ✨ added
-
-const API_BASE =
-  window.location.hostname === 'localhost'
-    ? 'http://localhost:8000'
-    : 'https://emmanuel-worship-backend.onrender.com';
-
-const api = axios.create({ baseURL: API_BASE });
-
-// ensure DRF "next" links are HTTPS when the page is HTTPS
-const normalizeNext = (next) => {
-  if (!next) return null;
-  try {
-    const u = new URL(next, API_BASE);
-    if (window.location.protocol === 'https:' && u.protocol === 'http:') {
-      u.protocol = 'https:';
-    }
-    return u.toString();
-  } catch {
-    return next.replace(/^http:\/\//i, 'https://');
-  }
-};
+import logo from './logo.png'; // Ensure you have a logo.png file in the appropriate directory
 
 const PlanList = () => {
   const [plans, setPlans] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // YYYY-MM-DD from <input type="date">
   const [menuOpen, setMenuOpen] = useState(false);
   const [dayTypeFilter, setDayTypeFilter] = useState({
-    ALL: true,
-    TH: false,
-    SU: false,
-    OT: false,
+    ALL: true, TH: false, SU: false, OT: false,
   });
+
+  // server-side pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const plansPerPage = 15;
+  const plansPerPage = 15; // keep your UI page size
+  const [count, setCount] = useState(0); // total items on server
+  const totalPages = Math.ceil(count / plansPerPage);
 
   useEffect(() => {
-    // Fetch ALL pages so client-side pagination works over the full list
-    const fetchAll = async () => {
-      try {
-        let url = '/api/plans/'; // relative to API_BASE
-        const all = [];
-        while (url) {
-          const { data } = await api.get(url);
-          const chunk = Array.isArray(data) ? data : (data?.results ?? []);
-          all.push(...chunk);
-          url = normalizeNext(data?.next); // follow DRF pagination safely
-        }
-        setPlans(all);
-      } catch (error) {
-        console.error('There was an error fetching the plans!', error);
-      }
-    };
-    fetchAll();
+    fetchPage(1); // initial load
   }, []);
 
-  // 🔁 Reset to page 1 whenever search or filters change
+  // refetch when search term changes (debounced)
   useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm, dayTypeFilter]);
+    const t = setTimeout(() => fetchPage(1), 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
 
-  const handleSearch = event => setSearchTerm(event.target.value);
+  // refetch when day type filter changes
+  useEffect(() => {
+    fetchPage(1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dayTypeFilter.TH, dayTypeFilter.SU, dayTypeFilter.OT, dayTypeFilter.ALL]);
+
+  const fetchPage = async (page) => {
+    try {
+      const params = {
+        page,
+        page_size: plansPerPage,
+        ordering: '-date', // newest first
+      };
+
+      // exact date filter if provided (YYYY-MM-DD)
+      if (searchTerm) {
+        params.date = searchTerm;
+      }
+
+      // day_type filter (comma-separated SU,TH,OT) unless "ALL"
+      const selected = ['TH', 'SU', 'OT'].filter(k => dayTypeFilter[k]);
+      if (!dayTypeFilter.ALL && selected.length > 0 && selected.length < 3) {
+        params.day_type = selected.join(',');
+      }
+      // If ALL or all three are selected, omit param to include everything
+
+      const { data } = await axios.get('https://emmanuel-worship-backend.onrender.com/api/plans/', { params });
+      setPlans(data.results || []);
+      setCount(data.count || 0);
+      setCurrentPage(page);
+    } catch (error) {
+      console.error('There was an error fetching the plans!', error);
+      setPlans([]);
+      setCount(0);
+    }
+  };
+
+  const handleSearch = event => {
+    setSearchTerm(event.target.value);
+  };
 
   const handleDayTypeChange = event => {
     const { name, checked } = event.target;
@@ -78,7 +82,9 @@ const PlanList = () => {
     } else {
       setDayTypeFilter(prevFilter => {
         const updatedFilter = { ...prevFilter, [name]: checked, ALL: false };
-        if (updatedFilter.TH && updatedFilter.SU && updatedFilter.OT) updatedFilter.ALL = true;
+        if (updatedFilter.TH && updatedFilter.SU && updatedFilter.OT) {
+          updatedFilter.ALL = true;
+        }
         return updatedFilter;
       });
     }
@@ -97,25 +103,10 @@ const PlanList = () => {
     return `${day} ${month}, ${year}`;
   };
 
-  const source = Array.isArray(plans) ? plans : [];
-  const filteredPlans = source
-    .filter(plan =>
-      (plan?.date ?? '').includes(searchTerm) &&
-      (dayTypeFilter.ALL || !!dayTypeFilter[plan?.day_type])
-    )
-    .sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
-
-  const indexOfLastPlan = currentPage * plansPerPage;
-  const indexOfFirstPlan = indexOfLastPlan - plansPerPage;
-  const currentPlans = filteredPlans.slice(indexOfFirstPlan, indexOfLastPlan);
-
-  const totalPages = Math.ceil(filteredPlans.length / plansPerPage) || 1;
-
   const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    const container = document.querySelector('.plan-list-container');
-    if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
-    else window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (pageNumber !== currentPage) {
+      fetchPage(pageNumber);
+    }
   };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -148,40 +139,64 @@ const PlanList = () => {
 
       <div className="filters">
         <label>
-          <input type="checkbox" name="ALL" checked={dayTypeFilter.ALL} onChange={handleDayTypeChange} />
+          <input
+            type="checkbox"
+            name="ALL"
+            checked={dayTypeFilter.ALL}
+            onChange={handleDayTypeChange}
+          />
           Բոլորը
         </label>
         <label>
-          <input type="checkbox" name="SU" checked={dayTypeFilter.SU} onChange={handleDayTypeChange} />
+          <input
+            type="checkbox"
+            name="SU"
+            checked={dayTypeFilter.SU}
+            onChange={handleDayTypeChange}
+          />
           Կիրակի
         </label>
         <label>
-          <input type="checkbox" name="TH" checked={dayTypeFilter.TH} onChange={handleDayTypeChange} />
+          <input
+            type="checkbox"
+            name="TH"
+            checked={dayTypeFilter.TH}
+            onChange={handleDayTypeChange}
+          />
           Հինգշաբթի
         </label>
         <label>
-          <input type="checkbox" name="OT" checked={dayTypeFilter.OT} onChange={handleDayTypeChange} />
+          <input
+            type="checkbox"
+            name="OT"
+            checked={dayTypeFilter.OT}
+            onChange={handleDayTypeChange}
+          />
           Այլ
         </label>
       </div>
 
-      {/* render the paged slice */}
       <ul className="plan-list">
-        {currentPlans.map(plan => (
+        {plans.map(plan => (
           <li key={plan.id} className="plan-item">
-            <Link to={`/plans/${plan.id}`} className="plan-link">{formatDate(plan.date)}</Link>
+            <Link to={`/plans/${plan.id}`} className="plan-link">
+              {formatDate(plan.date)}
+            </Link>
           </li>
         ))}
       </ul>
 
-      {/* pretty, arrow/ellipsis pagination */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-        siblingCount={1}
-        boundaryCount={1}
-      />
+      <div className="pagination">
+        {[...Array(totalPages)].map((_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={`page-button ${index + 1 === currentPage ? 'active' : ''}`}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
