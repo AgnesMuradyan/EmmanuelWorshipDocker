@@ -5,6 +5,27 @@ import './PlanList.css';
 import logo from './logo.png';
 import Pagination from './Pagination'; // ✨ added
 
+const API_BASE =
+  window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://emmanuel-worship-backend.onrender.com';
+
+const api = axios.create({ baseURL: API_BASE });
+
+// ensure DRF "next" links are HTTPS when the page is HTTPS
+const normalizeNext = (next) => {
+  if (!next) return null;
+  try {
+    const u = new URL(next, API_BASE);
+    if (window.location.protocol === 'https:' && u.protocol === 'http:') {
+      u.protocol = 'https:';
+    }
+    return u.toString();
+  } catch {
+    return next.replace(/^http:\/\//i, 'https://');
+  }
+};
+
 const PlanList = () => {
   const [plans, setPlans] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,13 +43,13 @@ const PlanList = () => {
     // Fetch ALL pages so client-side pagination works over the full list
     const fetchAll = async () => {
       try {
-        let url = 'https://emmanuel-worship-backend.onrender.com/api/plans/';
+        let url = '/api/plans/'; // relative to API_BASE
         const all = [];
         while (url) {
-          const { data } = await axios.get(url);
+          const { data } = await api.get(url);
           const chunk = Array.isArray(data) ? data : (data?.results ?? []);
           all.push(...chunk);
-          url = data?.next ?? null; // follow DRF pagination
+          url = normalizeNext(data?.next); // follow DRF pagination safely
         }
         setPlans(all);
       } catch (error) {
