@@ -19,7 +19,7 @@ const SongList = () => {
   const fetchPage = async (page, term) => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_BASE}/songs/`, {
+      const { data } = await axios.get(`${API_BASE}/api/songs/`, {
         params: {
           page,
           page_size: PAGE_SIZE,     // request 15 from the server
