@@ -5,6 +5,27 @@ import './SongList.css';
 import logo from './logo.png';
 import Pagination from './Pagination';
 
+const API_BASE =
+  window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://emmanuel-worship-backend.onrender.com';
+
+const api = axios.create({ baseURL: API_BASE });
+
+// ensure DRF "next" links are HTTPS when the page is HTTPS
+const normalizeNext = (next) => {
+  if (!next) return null;
+  try {
+    const u = new URL(next, API_BASE);
+    if (window.location.protocol === 'https:' && u.protocol === 'http:') {
+      u.protocol = 'https:';
+    }
+    return u.toString();
+  } catch {
+    return next.replace(/^http:\/\//i, 'https://');
+  }
+};
+
 const SongList = () => {
   const [songs, setSongs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,13 +37,13 @@ const SongList = () => {
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        let url = 'https://emmanuel-worship-backend.onrender.com/api/songs/';
+        let url = '/api/songs/'; // relative to API_BASE
         const all = [];
         while (url) {
-          const { data } = await axios.get(url);
+          const { data } = await api.get(url);
           const chunk = Array.isArray(data) ? data : (data?.results ?? []);
           all.push(...chunk);
-          url = data?.next ?? null; // follow DRF pagination if present
+          url = normalizeNext(data?.next); // follow DRF pagination safely
         }
         setSongs(all);
       } catch (error) {
@@ -114,7 +135,6 @@ const SongList = () => {
         ))}
       </ul>
 
-      {/* Pretty, compact, accessible pagination */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
