@@ -1,0 +1,74 @@
+/* Pagination (matches your blue palette) */
+.pg-root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 20px;
+}
+
+.pg-list {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  margin: 0 6px;
+  padding: 0;
+}
+
+/* Arrows + numbers share the same look */
+.pg-btn,
+.pg-num {
+  appearance: none;
+  border: none;
+  background: #003366;     /* your base blue */
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color .15s ease, transform .06s ease, box-shadow .15s ease;
+}
+
+.pg-btn:hover:not(:disabled),
+.pg-num:hover {
+  background: #00509E;     /* your hover blue */
+}
+
+.pg-btn:active,
+.pg-num:active {
+  transform: translateY(1px);
+}
+
+.pg-btn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+/* Current page */
+.pg-num.active {
+  background: #00509E;     /* active matches your hover */
+  box-shadow: 0 0 0 2px rgba(0,80,158,.25) inset;
+}
+
+/* Ellipsis between ranges */
+.pg-ellipsis {
+  color: #003366;
+  padding: 0 6px;
+  user-select: none;
+}
+
+/* Keyboard focus ring */
+.pg-btn:focus-visible,
+.pg-num:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(0,80,158,.35),  /* outer ring in your blue */
+    0 0 0 2px #00509E inset;       /* inner accent */
+}
+
+/* Compact on small screens */
+@media (max-width: 480px) {
+  .pg-btn, .pg-num { padding: 8px 10px; }
+}
