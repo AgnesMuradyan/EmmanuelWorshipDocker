@@ -4,43 +4,56 @@ import axios from 'axios';
 import './SongList.css';
 import logo from './logo.png';
 
+const API_BASE = 'https://emmanuel-worship-backend.onrender.com';   // adjust if your backend prefix differs
+const PAGE_SIZE = 15;                            // ← 15 per page
+
 const SongList = () => {
   const [songs, setSongs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const songsPerPage = 15;
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const totalPages = Math.ceil(count / PAGE_SIZE);
+
+  const fetchPage = async (page, term) => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`${API_BASE}/songs/`, {
+        params: {
+          page,
+          page_size: PAGE_SIZE,     // request 15 from the server
+          search: term || '',
+          ordering: 'title',
+        },
+      });
+      setSongs(data.results || []);
+      setCount(data.count || 0);
+      setCurrentPage(page);
+    } catch (err) {
+      console.error('There was an error fetching the songs!', err);
+      setSongs([]);
+      setCount(0);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/songs/')
-      .then(response => {
-        console.log('API response:', response.data);  // Debugging line
-        setSongs(response.data);
-      })
-      .catch(error => console.error('There was an error fetching the songs!', error));
+    fetchPage(1, '');
   }, []);
 
-  const handleSearch = event => {
-    setSearchTerm(event.target.value);
-  };
-
-  const filteredSongs = songs
-    .filter(song => song.title.toLowerCase().includes(searchTerm.toLowerCase()))
-    .sort((a, b) => a.title.localeCompare(b.title));  // Sort alphabetically
-
-  const indexOfLastSong = currentPage * songsPerPage;
-  const indexOfFirstSong = indexOfLastSong - songsPerPage;
-  const currentSongs = filteredSongs.slice(indexOfFirstSong, indexOfLastSong);
-
-  const totalPages = Math.ceil(filteredSongs.length / songsPerPage);
+  // Debounce search by 300ms
+  useEffect(() => {
+    const t = setTimeout(() => fetchPage(1, searchTerm), 300);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+    if (pageNumber !== currentPage) fetchPage(pageNumber, searchTerm);
   };
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  const toggleMenu = () => setMenuOpen(!menuOpen);
 
   return (
     <div className="song-list-container">
@@ -57,35 +70,42 @@ const SongList = () => {
           <Link to="/songs" className="nav-link" onClick={toggleMenu}>Երգեր</Link>
         </div>
       </nav>
+
       <h1 className="title">Երգացանկ</h1>
+
       <input
         type="text"
         placeholder="Ներածե'ք վերնագիրը"
         value={searchTerm}
-        onChange={handleSearch}
+        onChange={(e) => setSearchTerm(e.target.value)}
         className="search-input"
       />
-      {filteredSongs.length === 0 && (
-        <p className="no-songs-message">Երգերը բեռնվում են...</p>
-      )}
+
+      {loading && <p className="no-songs-message">Երգերը բեռնվում են...</p>}
+      {!loading && songs.length === 0 && <p className="no-songs-message">Չկան արդյունքներ</p>}
+
       <ul className="song-list">
-        {currentSongs.map(song => (
+        {songs.map(song => (
           <li key={song.id} className="song-item">
             <Link to={`/songs/${song.id}`} className="song-link">{song.title}</Link>
           </li>
         ))}
       </ul>
-      <div className="pagination">
-        {[...Array(totalPages)].map((_, index) => (
-          <button
-            key={index + 1}
-            onClick={() => handlePageChange(index + 1)}
-            className={`page-button ${index + 1 === currentPage ? 'active' : ''}`}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
+
+      {totalPages > 1 && (
+        <div className="pagination">
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+            <button
+              key={page}
+              onClick={() => handlePageChange(page)}
+              className={`page-button ${page === currentPage ? 'active' : ''}`}
+              disabled={loading}
+            >
+              {page}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
