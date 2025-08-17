@@ -19,9 +19,23 @@ const PlanList = () => {
   const plansPerPage = 15;
 
   useEffect(() => {
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/plans/')
-      .then(response => setPlans(response.data))
-      .catch(error => console.error('There was an error fetching the plans!', error));
+    // Fetch ALL pages so client-side pagination works over the full list
+    const fetchAll = async () => {
+      try {
+        let url = 'https://emmanuel-worship-backend.onrender.com/api/plans/';
+        const all = [];
+        while (url) {
+          const { data } = await axios.get(url);
+          const chunk = Array.isArray(data) ? data : (data?.results ?? []);
+          all.push(...chunk);
+          url = data?.next ?? null; // follow DRF pagination
+        }
+        setPlans(all);
+      } catch (error) {
+        console.error('There was an error fetching the plans!', error);
+      }
+    };
+    fetchAll();
   }, []);
 
   // 🔁 Reset to page 1 whenever search or filters change
@@ -29,9 +43,7 @@ const PlanList = () => {
     setCurrentPage(1);
   }, [searchTerm, dayTypeFilter]);
 
-  const handleSearch = event => {
-    setSearchTerm(event.target.value);
-  };
+  const handleSearch = event => setSearchTerm(event.target.value);
 
   const handleDayTypeChange = event => {
     const { name, checked } = event.target;
@@ -44,14 +56,8 @@ const PlanList = () => {
       });
     } else {
       setDayTypeFilter(prevFilter => {
-        const updatedFilter = {
-          ...prevFilter,
-          [name]: checked,
-          ALL: false,
-        };
-        if (updatedFilter.TH && updatedFilter.SU && updatedFilter.OT) {
-          updatedFilter.ALL = true;
-        }
+        const updatedFilter = { ...prevFilter, [name]: checked, ALL: false };
+        if (updatedFilter.TH && updatedFilter.SU && updatedFilter.OT) updatedFilter.ALL = true;
         return updatedFilter;
       });
     }
@@ -70,10 +76,11 @@ const PlanList = () => {
     return `${day} ${month}, ${year}`;
   };
 
-  const filteredPlans = plans
+  const source = Array.isArray(plans) ? plans : [];
+  const filteredPlans = source
     .filter(plan =>
-      plan.date.includes(searchTerm) &&
-      (dayTypeFilter.ALL || dayTypeFilter[plan.day_type])
+      (plan?.date ?? '').includes(searchTerm) &&
+      (dayTypeFilter.ALL || !!dayTypeFilter[plan?.day_type])
     )
     .sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
 
@@ -90,9 +97,7 @@ const PlanList = () => {
     else window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+  const toggleMenu = () => setMenuOpen(!menuOpen);
 
   return (
     <div className="plan-list-container">
@@ -109,7 +114,9 @@ const PlanList = () => {
           <Link to="/songs" className="nav-link" onClick={toggleMenu}>Երգեր</Link>
         </div>
       </nav>
+
       <h1 className="title">Ծրագրեր</h1>
+
       <input
         type="date"
         placeholder="Search by date"
@@ -117,41 +124,22 @@ const PlanList = () => {
         onChange={handleSearch}
         className="search-input"
       />
+
       <div className="filters">
         <label>
-          <input
-            type="checkbox"
-            name="ALL"
-            checked={dayTypeFilter.ALL}
-            onChange={handleDayTypeChange}
-          />
+          <input type="checkbox" name="ALL" checked={dayTypeFilter.ALL} onChange={handleDayTypeChange} />
           Բոլորը
         </label>
         <label>
-          <input
-            type="checkbox"
-            name="SU"
-            checked={dayTypeFilter.SU}
-            onChange={handleDayTypeChange}
-          />
+          <input type="checkbox" name="SU" checked={dayTypeFilter.SU} onChange={handleDayTypeChange} />
           Կիրակի
         </label>
         <label>
-          <input
-            type="checkbox"
-            name="TH"
-            checked={dayTypeFilter.TH}
-            onChange={handleDayTypeChange}
-          />
+          <input type="checkbox" name="TH" checked={dayTypeFilter.TH} onChange={handleDayTypeChange} />
           Հինգշաբթի
         </label>
         <label>
-          <input
-            type="checkbox"
-            name="OT"
-            checked={dayTypeFilter.OT}
-            onChange={handleDayTypeChange}
-          />
+          <input type="checkbox" name="OT" checked={dayTypeFilter.OT} onChange={handleDayTypeChange} />
           Այլ
         </label>
       </div>
