@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './SongList.css';
 import logo from './logo.png';
+import Pagination from './Pagination';
 
 const API_BASE = 'https://emmanuel-worship-backend.onrender.com';   // adjust if your backend prefix differs
 const PAGE_SIZE = 15;                            // ← 15 per page
@@ -93,18 +94,13 @@ const SongList = () => {
       </ul>
 
       {totalPages > 1 && (
-        <div className="pagination">
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`page-button ${page === currentPage ? 'active' : ''}`}
-              disabled={loading}
-            >
-              {page}
-            </button>
-          ))}
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages || 1}
+          onPageChange={handlePageChange}
+          siblingCount={1}
+          boundaryCount={1}
+        />
       )}
     </div>
   );

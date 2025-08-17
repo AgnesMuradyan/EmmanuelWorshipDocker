@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './PlanList.css';
 import logo from './logo.png'; // Ensure you have a logo.png file in the appropriate directory
+import Pagination from './Pagination';
+
 
 const PlanList = () => {
   const [plans, setPlans] = useState([]);
@@ -186,17 +188,13 @@ const PlanList = () => {
         ))}
       </ul>
 
-      <div className="pagination">
-        {[...Array(totalPages)].map((_, index) => (
-          <button
-            key={index + 1}
-            onClick={() => handlePageChange(index + 1)}
-            className={`page-button ${index + 1 === currentPage ? 'active' : ''}`}
-          >
-            {index + 1}
-          </button>
-        ))}
-      </div>
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages || 1}
+        onPageChange={handlePageChange}
+        siblingCount={1}
+        boundaryCount={1}
+      />
     </div>
   );
 };
