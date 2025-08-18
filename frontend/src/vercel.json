@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    { "source": "/songs/:id(\\d+)", "destination": "https://emmanuel-worship-backend.onrender.com/songs/:id" },
+
+    { "source": "/plans/:id(\\d+)", "destination": "https://emmanuel-worship-backend.onrender.com/plans/:id" },
+    { "source": "/plans",           "destination": "https://emmanuel-worship-backend.onrender.com/plans" },
+
+    { "source": "/api/(.*)",        "destination": "https://emmanuel-worship-backend.onrender.com/api/$1" },
+
+    { "source": "/(.*)",            "destination": "/" }
+  ]
+}
