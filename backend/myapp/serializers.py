@@ -13,6 +13,10 @@ class AlbumSerializer(serializers.ModelSerializer):
         model = Album
         fields = ['id', 'title']
 
+class SongChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Song
+        fields = ("id", "title")
 
 class SongSerializer(serializers.ModelSerializer):
     album = AlbumSerializer(read_only=True)
@@ -130,6 +134,9 @@ class PlanSerializer(serializers.ModelSerializer):
 
         return instance
 
-
+class PlanChoiceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Plan
+        fields = ("id", "date", "day_type")
 
 

@@ -18,6 +18,10 @@ from rest_framework import viewsets
 from rest_framework.filters import SearchFilter, OrderingFilter
 from .models import Song
 from .serializers import SongSerializer
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from .serializers import SongSerializer, SongChoiceSerializer
+
 
 def index(request):
     return render(request, 'index.html')
@@ -32,8 +36,19 @@ class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all().order_by("title")
     serializer_class = SongSerializer
     filter_backends = [SearchFilter, OrderingFilter]
-    search_fields = ["title", "album__title"]  # ?search=...
-    ordering_fields = ["title", "created_at", "id"]  # ?ordering=title
+    search_fields = ["title", "album__title"]
+    ordering_fields = ["title", "created_at", "id"]
+
+    @action(detail=False, methods=["get"], url_path="choices")
+    def choices(self, request):
+        qs = self.filter_queryset(self.get_queryset()) \
+                 .order_by("title") \
+                 .values("id", "title")  # ✅ returns dicts straight from DB
+
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            return self.get_paginated_response(list(page))
+        return Response(list(qs))
 
     @action(detail=True, methods=['get'], url_path='view-chords', url_name='view_chords')
     def view_chords(self, request, pk=None):
@@ -62,8 +77,8 @@ class PlanViewSet(viewsets.ModelViewSet):
     ordering = ["-date", "-id"]
 
     def get_queryset(self):
-        qs = super().get_queryset()  # uses the queryset above
-
+        qs = super().get_queryset()
+        # existing filters:
         date_val = self.request.query_params.get("date")
         if date_val:
             qs = qs.filter(date=date_val)
@@ -72,8 +87,17 @@ class PlanViewSet(viewsets.ModelViewSet):
         if dt_csv:
             wanted = [v.strip().upper() for v in dt_csv.split(",") if v.strip()]
             qs = qs.filter(day_type__in=wanted)
-
         return qs
+
+    @action(detail=False, methods=["get"], url_path="choices")
+    def choices(self, request):
+        qs = self.filter_queryset(self.get_queryset()) \
+            .order_by("-date", "-id") \
+            .values("id", "date", "day_type")
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            return self.get_paginated_response(list(page))
+        return Response(list(qs))
 
     @action(detail=True, methods=['get'], url_path='view-songs', url_name='view_songs')
     def view_songs(self, request, pk=None):
