@@ -4,8 +4,8 @@ import axios from 'axios';
 import './SongList.css';
 import logo from './logo.png';
 import Pagination from './Pagination';
+import API_BASE from '../apiBase';
 
-const API_BASE = 'https://emmanuel-worship-backend.onrender.com';   // adjust if your backend prefix differs
 const PAGE_SIZE = 15;
 
 // 👇 Use the compact selector endpoint

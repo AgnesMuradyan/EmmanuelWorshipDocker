@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import './PlanDetail.css';
 import logo from "./logo.png";
+import API_BASE from '../apiBase';
 
 const PlanDetail = () => {
   const { id } = useParams();
@@ -10,7 +11,7 @@ const PlanDetail = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(`https://emmanuel-worship-backend.onrender.com/api/plans/${id}/`)
+    axios.get(`${API_BASE}/api/plans/${id}/`)
       .then(response => setPlan(response.data))
       .catch(error => console.error('There was an error fetching the plan!', error));
   }, [id]);
@@ -20,7 +21,7 @@ const PlanDetail = () => {
   };
 
   const downloadConcatenatedPowerpoint = () => {
-    axios.get(`https://emmanuel-worship-backend.onrender.com/api/plans/${id}/download-concatenated-powerpoint/`, { responseType: 'blob' })
+    axios.get(`${API_BASE}/api/plans/${id}/download-concatenated-powerpoint/`, { responseType: 'blob' })
       .then(response => {
         const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }));
         const link = document.createElement('a');
