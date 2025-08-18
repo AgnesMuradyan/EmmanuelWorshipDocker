@@ -6,7 +6,10 @@ import logo from './logo.png';
 import Pagination from './Pagination';
 
 const API_BASE = 'https://emmanuel-worship-backend.onrender.com';   // adjust if your backend prefix differs
-const PAGE_SIZE = 15;                            // ← 15 per page
+const PAGE_SIZE = 15;
+
+// 👇 Use the compact selector endpoint
+const SONGS_CHOICES_URL = `${API_BASE}/api/songs/choices/`;
 
 const SongList = () => {
   const [songs, setSongs] = useState([]);
@@ -20,10 +23,10 @@ const SongList = () => {
   const fetchPage = async (page, term) => {
     setLoading(true);
     try {
-      const { data } = await axios.get(`${API_BASE}/api/songs/`, {
+      const { data } = await axios.get(SONGS_CHOICES_URL, {
         params: {
           page,
-          page_size: PAGE_SIZE,     // request 15 from the server
+          page_size: PAGE_SIZE,
           search: term || '',
           ordering: 'title',
         },

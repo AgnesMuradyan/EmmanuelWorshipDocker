@@ -5,6 +5,7 @@ import './PlanList.css';
 import logo from './logo.png'; // Ensure you have a logo.png file in the appropriate directory
 import Pagination from './Pagination';
 
+const PLANS_CHOICES_URL = 'https://emmanuel-worship-backend.onrender.com/api/plans/choices/';
 
 const PlanList = () => {
   const [plans, setPlans] = useState([]);
@@ -57,7 +58,8 @@ const PlanList = () => {
       }
       // If ALL or all three are selected, omit param to include everything
 
-      const { data } = await axios.get('https://emmanuel-worship-backend.onrender.com/api/plans/', { params });
+      // ⬇️ Use the compact choices endpoint
+      const { data } = await axios.get(PLANS_CHOICES_URL, { params });
       setPlans(data.results || []);
       setCount(data.count || 0);
       setCurrentPage(page);
