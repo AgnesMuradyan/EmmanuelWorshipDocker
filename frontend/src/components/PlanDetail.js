@@ -22,7 +22,11 @@ const PlanDetail = () => {
   const downloadConcatenatedPowerpoint = () => {
     axios.get(`https://emmanuel-worship-backend.onrender.com/api/plans/${id}/download-concatenated-powerpoint/`, { responseType: 'blob' })
       .then(response => {
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }));
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+          })
+        );
         const link = document.createElement('a');
         link.href = url;
         link.setAttribute('download', `Plan_${plan.date}_concatenated_powerpoint.pptx`);
@@ -31,6 +35,25 @@ const PlanDetail = () => {
         link.remove();
       })
       .catch(error => console.error('There was an error downloading the concatenated PowerPoint!', error));
+  };
+
+  // NEW: download DOCX summary (date -> lead singers -> singers -> songs)
+  const downloadSummaryDocx = () => {
+    axios.get(`https://emmanuel-worship-backend.onrender.com/api/plans/${id}/download-summary-docx/`, { responseType: 'blob' })
+      .then(response => {
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          })
+        );
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Plan_${plan.date}_summary.docx`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      })
+      .catch(error => console.error('There was an error downloading the DOCX summary!', error));
   };
 
   if (!plan) return <div className="loading">Loading...</div>;
@@ -53,6 +76,7 @@ const PlanDetail = () => {
                   <Link to="/songs" className="nav-link">Երգեր</Link>
               </div>
           </nav>
+
           <h1 className="plan-date">Ծրագիր {plan.date}</h1>
 
           <div className="section">
@@ -93,7 +117,14 @@ const PlanDetail = () => {
               </ul>
           </div>
 
-          <button className="download-button" onClick={downloadConcatenatedPowerpoint}>Ներբեռնել միակցված սլայդը</button>
+          <div className="download-actions">
+              <button className="download-button" onClick={downloadConcatenatedPowerpoint}>
+                  Ներբեռնել միակցված սլայդը
+              </button>
+              <button className="download-button" onClick={downloadSummaryDocx}>
+                  Ներբեռնել ծրագիրը (DOCX)
+              </button>
+          </div>
       </div>
   );
 };
