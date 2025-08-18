@@ -2,27 +2,27 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './PlanList.css';
-import logo from './logo.png'; // Ensure you have a logo.png file in the appropriate directory
+import logo from './logo.png';
 import Pagination from './Pagination';
 
 const PLANS_CHOICES_URL = 'https://emmanuel-worship-backend.onrender.com/api/plans/choices/';
 
 const PlanList = () => {
   const [plans, setPlans] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(''); // YYYY-MM-DD from <input type="date">
+  const [searchTerm, setSearchTerm] = useState(''); // YYYY-MM-DD
   const [menuOpen, setMenuOpen] = useState(false);
-  const [dayTypeFilter, setDayTypeFilter] = useState({
-    ALL: true, TH: false, SU: false, OT: false,
-  });
+
+  // single-select day type: 'ALL' | 'SU' | 'TH' | 'OT'
+  const [selectedDayType, setSelectedDayType] = useState('ALL');
 
   // server-side pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const plansPerPage = 15; // keep your UI page size
-  const [count, setCount] = useState(0); // total items on server
+  const plansPerPage = 15;
+  const [count, setCount] = useState(0);
   const totalPages = Math.ceil(count / plansPerPage);
 
   useEffect(() => {
-    fetchPage(1); // initial load
+    fetchPage(1);
   }, []);
 
   // refetch when search term changes (debounced)
@@ -32,33 +32,27 @@ const PlanList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
-  // refetch when day type filter changes
+  // refetch when selected day type changes
   useEffect(() => {
     fetchPage(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dayTypeFilter.TH, dayTypeFilter.SU, dayTypeFilter.OT, dayTypeFilter.ALL]);
+  }, [selectedDayType]);
 
   const fetchPage = async (page) => {
     try {
       const params = {
         page,
         page_size: plansPerPage,
-        ordering: '-date', // newest first
+        ordering: '-date',
       };
 
-      // exact date filter if provided (YYYY-MM-DD)
-      if (searchTerm) {
-        params.date = searchTerm;
+      if (searchTerm) params.date = searchTerm;
+
+      // If ALL, omit day_type to include everything
+      if (selectedDayType !== 'ALL') {
+        params.day_type = selectedDayType; // one of SU, TH, OT
       }
 
-      // day_type filter (comma-separated SU,TH,OT) unless "ALL"
-      const selected = ['TH', 'SU', 'OT'].filter(k => dayTypeFilter[k]);
-      if (!dayTypeFilter.ALL && selected.length > 0 && selected.length < 3) {
-        params.day_type = selected.join(',');
-      }
-      // If ALL or all three are selected, omit param to include everything
-
-      // ⬇️ Use the compact choices endpoint
       const { data } = await axios.get(PLANS_CHOICES_URL, { params });
       setPlans(data.results || []);
       setCount(data.count || 0);
@@ -70,28 +64,10 @@ const PlanList = () => {
     }
   };
 
-  const handleSearch = event => {
-    setSearchTerm(event.target.value);
-  };
+  const handleSearch = (e) => setSearchTerm(e.target.value);
 
-  const handleDayTypeChange = event => {
-    const { name, checked } = event.target;
-    if (name === "ALL") {
-      setDayTypeFilter({
-        ALL: checked,
-        TH: checked,
-        SU: checked,
-        OT: checked,
-      });
-    } else {
-      setDayTypeFilter(prevFilter => {
-        const updatedFilter = { ...prevFilter, [name]: checked, ALL: false };
-        if (updatedFilter.TH && updatedFilter.SU && updatedFilter.OT) {
-          updatedFilter.ALL = true;
-        }
-        return updatedFilter;
-      });
-    }
+  const handleDayTypeChange = (e) => {
+    setSelectedDayType(e.target.value); // 'ALL' | 'SU' | 'TH' | 'OT'
   };
 
   const monthNames = [
@@ -99,7 +75,7 @@ const PlanList = () => {
     'Հուլիս', 'Օգոստոս', 'Սեպտեմբեր', 'Հոկտեմբեր', 'Նոյեմբեր', 'Դեկտեմբեր'
   ];
 
-  const formatDate = dateString => {
+  const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate();
     const month = monthNames[date.getMonth()];
@@ -108,9 +84,7 @@ const PlanList = () => {
   };
 
   const handlePageChange = (pageNumber) => {
-    if (pageNumber !== currentPage) {
-      fetchPage(pageNumber);
-    }
+    if (pageNumber !== currentPage) fetchPage(pageNumber);
   };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -131,7 +105,7 @@ const PlanList = () => {
         </div>
       </nav>
 
-      <h1 className="title">Ծրագրեր</h1>
+      <h1 className="song-title">Ծրագրեր</h1>
 
       <input
         type="date"
@@ -141,47 +115,52 @@ const PlanList = () => {
         className="search-input"
       />
 
+      {/* Single-select filters (radio-like) */}
       <div className="filters">
         <label>
           <input
-            type="checkbox"
-            name="ALL"
-            checked={dayTypeFilter.ALL}
+            type="radio"
+            name="dayType"
+            value="ALL"
+            checked={selectedDayType === 'ALL'}
             onChange={handleDayTypeChange}
           />
-          Բոլորը
+          <span>Բոլորը</span>
         </label>
         <label>
           <input
-            type="checkbox"
-            name="SU"
-            checked={dayTypeFilter.SU}
+            type="radio"
+            name="dayType"
+            value="SU"
+            checked={selectedDayType === 'SU'}
             onChange={handleDayTypeChange}
           />
-          Կիրակի
+          <span>Կիրակի</span>
         </label>
         <label>
           <input
-            type="checkbox"
-            name="TH"
-            checked={dayTypeFilter.TH}
+            type="radio"
+            name="dayType"
+            value="TH"
+            checked={selectedDayType === 'TH'}
             onChange={handleDayTypeChange}
           />
-          Հինգշաբթի
+          <span>Հինգշաբթի</span>
         </label>
         <label>
           <input
-            type="checkbox"
-            name="OT"
-            checked={dayTypeFilter.OT}
+            type="radio"
+            name="dayType"
+            value="OT"
+            checked={selectedDayType === 'OT'}
             onChange={handleDayTypeChange}
           />
-          Այլ
+          <span>Այլ</span>
         </label>
       </div>
 
       <ul className="plan-list">
-        {plans.map(plan => (
+        {plans.map((plan) => (
           <li key={plan.id} className="plan-item">
             <Link to={`/plans/${plan.id}`} className="plan-link">
               {formatDate(plan.date)}

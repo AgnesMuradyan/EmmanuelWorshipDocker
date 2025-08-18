@@ -1,165 +1,255 @@
+/* Import modern font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Merriweather:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+Armenian:wght@600;700&display=swap');
+
+/* Global */
+* { box-sizing: border-box; }
 body {
-  background-color: #E6E6FA; /* Very light purple background for the entire page */
+  background-color: #f9faff;
   margin: 0;
   padding: 0;
-  font-family: 'Arial, sans-serif';
+  font-family: 'Poppins', sans-serif;
+  color: #2c3e50;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-.plan-list-container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #f0f8ff;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+/* Shared container (works for plan-list-container & song-list-container) */
+.plan-list-container,
+.song-list-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 25px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.4s ease-in-out;
 }
 
+/* Navbar */
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #003366;
-  padding: 10px 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+  background: linear-gradient(135deg, #003366, #00509E);
+  padding: 12px 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  position: relative;
 }
-
-.navbar-brand {
-  display: flex;
-  align-items: center;
-}
-
-.logo {
-  height: 40px;
-  margin-right: 10px;
-  color: #ffffff;
-}
-
-.brand-name {
-  font-size: 1.5rem;
-  color: #ffffff;
-}
+.navbar-brand { display: flex; align-items: center; }
+.logo { height: 42px; margin-right: 10px; }
+.brand-name { font-size: 1.6rem; font-weight: 600; color: #fff; letter-spacing: .5px; }
 
 .menu-icon {
-  font-size: 1.5rem;
+  font-size: 1.8rem;
   color: #ffffff;
   cursor: pointer;
   display: none;
+  z-index: 1000;
 }
 
-.nav-links {
-  display: flex;
-  gap: 20px;
-}
-
+.nav-links { display: flex; gap: 25px; }
 .nav-link {
   color: #ffffff;
+  font-weight: 500;
   text-decoration: none;
-  font-size: 1.2rem;
-  padding: 10px 15px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
+  font-size: 1.05rem;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.nav-link:hover,
+.nav-link:focus-visible {
+  background-color: rgba(255, 255, 255, 0.15);
+  outline: none;
 }
 
-.nav-link:hover {
-  background-color: #00509E;
-  text-decoration: none;
-}
-
-.song-list-container {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #f0f8ff; /* Light blue background for the song list container */
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
+/* Title (use Merriweather for headings) */
 .title {
+  font-family: 'Merriweather', serif;
   font-size: 2.5rem;
   color: #003366;
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  font-weight: 700;
 }
 
+/* Search box */
 .search-input {
   width: 100%;
-  padding: 10px;
+  padding: 12px 15px;
   margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1.5px solid #d1d9e6;
+  border-radius: 10px;
   font-size: 1rem;
-  box-sizing: border-box;
+  transition: all 0.2s ease-in-out;
+  background: #ffffff;
+}
+.search-input:focus {
+  outline: none;
+  border-color: #00509E;
+  box-shadow: 0 0 0 4px rgba(0, 80, 158, 0.15);
 }
 
-.no-songs-message {
-  font-size: 1.2rem;
-  color: #ff6347; /* Tomato color for the no songs message */
+/* Filters (pill toggle buttons, used on Plans page) */
+.filters {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.filters label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1.5px solid #d1d9e6;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  user-select: none;
+}
+.filters label:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,.08); }
+.filters input { display: none; }
+.filters label span {
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #003366;
+  border-radius: 999px;
+  transition: all 0.25s ease;
+}
+.filters input:checked + span {
+  background: linear-gradient(135deg, #00509E, #003366);
+  color: #ffffff;
+  border: 1.5px solid #00509E;
+  box-shadow: 0 6px 14px rgba(0, 80, 158, 0.25);
+}
+
+.song-title {
+  font-family: 'Noto Serif Armenian', serif;
+  font-size: 2.6rem;
+  color: #003366;   /* deep purple for distinction */
   text-align: center;
+  margin-bottom: 25px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
-.song-list {
-  list-style: none;
-  padding: 0;
-}
-
-.song-item {
-  margin-bottom: 10px;
-}
-
-.song-link {
-  color: #6A5ACD; /* Dark Slate Blue for links */
+/* Plans list */
+.plan-list { list-style: none; padding: 0; margin: 0; }
+.plan-item { margin-bottom: 12px; }
+.plan-link {
+  display: block;
+  background: #f7f9fc;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 1.06rem;
+  font-weight: 600;
+  color: #00509E;
   text-decoration: none;
-  font-size: 1.2rem;
+  transition: all 0.25s ease;
+  border: 1px solid #e1e7f0;
+}
+.plan-link:hover,
+.plan-link:focus-visible {
+  background: #e8f0ff;
+  border-color: #cfdcf0;
+  transform: translateY(-2px);
+  outline: none;
 }
 
-.song-link:hover {
-  text-decoration: underline;
+/* Songs list */
+.song-list { list-style: none; padding: 0; margin: 0; }
+.song-item { margin-bottom: 12px; }
+.song-link {
+  display: block;
+  background: #f7f9fc;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 1.06rem;
+  font-weight: 600;
+  color: #00509E; /* match plan-link color */
+  text-decoration: none;
+  transition: all 0.25s ease;
+  border: 1px solid #e1e7f0;
+}
+.song-link:hover,
+.song-link:focus-visible {
+  background: #e8f0ff;
+  border-color: #cfdcf0;
+  transform: translateY(-2px);
+  outline: none;
 }
 
+/* Messages (loading / empty) */
+.no-songs-message {
+  font-size: 1.06rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-align: center;
+  background: #f7f9fc;
+  border: 1px solid #e5eaf3;
+  padding: 12px 14px;
+  border-radius: 10px;
+  margin: 8px 0 16px;
+}
 
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 26px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.page-button {
+  padding: 10px 16px;
+  border: none;
+  background: #003366;
+  color: #ffffff;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.98rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+  min-width: 44px;
+}
+.page-button:hover,
+.page-button:focus-visible { background: #004080; outline: none; }
+.page-button.active { background: #00509E; }
+
+/* Responsive menu */
 @media (max-width: 768px) {
-  .menu-icon {
-    display: block;
-  }
+  .menu-icon { display: block; }
   .nav-links {
     display: none;
     flex-direction: column;
-    gap: 10px;
-    background-color: #003366;
+    gap: 12px;
+    background: #003366;
     position: absolute;
     top: 60px;
     left: 0;
     width: 100%;
     padding: 20px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.25);
+    z-index: 999;
   }
-  .nav-links.active {
-    display: flex;
-  }
+  .nav-links.active { display: flex; }
 }
 
-.pagination {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
+/* Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.page-button {
-  padding: 10px 15px;
-  margin: 0 5px;
-  border: none;
-  background-color: #003366;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
-.page-button.active {
-  background-color: #00509E;
-}
-
-.page-button:hover {
-  background-color: #00509E;
+/* Focus rings */
+:focus-visible {
+  outline: 3px solid rgba(0, 80, 158, 0.35);
+  outline-offset: 2px;
 }

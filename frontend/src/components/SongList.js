@@ -75,11 +75,12 @@ const SongList = () => {
         </div>
       </nav>
 
-      <h1 className="title">Երգացանկ</h1>
+      <h1 className="song-title">Երգացանկ</h1>
+
 
       <input
-        type="text"
-        placeholder="Ներածե'ք վերնագիրը"
+          type="text"
+          placeholder="Ներածե'ք վերնագիրը"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="search-input"
