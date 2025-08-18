@@ -21,7 +21,16 @@ from .serializers import SongSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .serializers import SongSerializer, SongChoiceSerializer
-
+from io import BytesIO
+from django.http import HttpResponse
+from docx import Document
+from io import BytesIO
+from django.http import HttpResponse
+from rest_framework.decorators import action
+from docx import Document
+from docx.shared import Pt
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 
 def index(request):
     return render(request, 'index.html')
@@ -144,6 +153,133 @@ class PlanViewSet(viewsets.ModelViewSet):
                                 content_type='application/vnd.openxmlformats-officedocument.presentationml.presentation')
         response['Content-Disposition'] = f'attachment; filename="Plan_{plan.date}_concatenated_powerpoint.pptx"'
         return response
+
+    @action(detail=True, methods=['get'], url_path='download-summary-docx', url_name='download_summary_docx')
+    def download_summary_docx(self, request, pk=None):
+        # Prefetch to avoid N+1 queries
+        plan = (
+            self.get_queryset()
+            .prefetch_related('lead_singers', 'singers', 'songs')
+            .get(pk=pk)
+        )
+
+        doc = Document()
+
+        # Set global font to Calibri 16
+        normal = doc.styles['Normal']
+        normal.font.name = 'Calibri'
+        normal.font.size = Pt(16)
+
+        def full_names(qs):
+            names = []
+            for obj in qs:
+                first = getattr(obj, 'first_name', '') or ''
+                last = getattr(obj, 'last_name', '') or ''
+                n = f"{first} {last}".strip()
+                if n:
+                    names.append(n)
+            return names
+
+        def comma_join(items):
+            return ', '.join(items) if items else '—'
+
+        def add_bold_line(text):
+            p = doc.add_paragraph()
+            r = p.add_run(text)
+            r.bold = True
+            r.font.name = 'Calibri'
+            r.font.size = Pt(16)
+            return p
+
+        def add_label_value(label_armenian, value_text):
+            """Label (bold 16) + value (regular 16) on same line."""
+            p = doc.add_paragraph()
+            r_label = p.add_run(f"{label_armenian}՝ ")
+            r_label.bold = True
+            r_label.font.name = 'Calibri'
+            r_label.font.size = Pt(16)
+
+            r_val = p.add_run(value_text if value_text else '—')
+            r_val.bold = False
+            r_val.font.name = 'Calibri'
+            r_val.font.size = Pt(16)
+            return p
+
+        def add_horizontal_rule():
+            """Adds a stand-alone paragraph that renders a horizontal line (bottom border)."""
+            p = doc.add_paragraph()
+            p_el = p._element
+            pPr = p_el.get_or_add_pPr()
+            pBdr = OxmlElement('w:pBdr')
+            bottom = OxmlElement('w:bottom')
+            bottom.set(qn('w:val'), 'single')
+            bottom.set(qn('w:sz'), '12')  # thickness (1/8 pt units)
+            bottom.set(qn('w:space'), '1')
+            bottom.set(qn('w:color'), 'auto')
+            pBdr.append(bottom)
+            pPr.append(pBdr)
+            return p
+
+        # --- Date line (bold, 16) ---
+        try:
+            # Armenian-style punctuation for date: dd.MM․yy
+            date_str = plan.date.strftime('%d.%m․%y')
+        except Exception:
+            date_str = str(plan.date)
+        add_bold_line(date_str)
+
+        # --- Վարողներ (lead singers) ---
+        lead_text = comma_join(full_names(plan.lead_singers.all()))
+        add_label_value('Վարողներ', lead_text)
+
+        # --- Վոկալ (singers) ---
+        vocal_text = comma_join(full_names(plan.singers.all()))
+        add_label_value('Վոկալ', vocal_text)
+
+        # --- spacer then a horizontal line before "Երգեր" ---
+        doc.add_paragraph("")  # blank line (not bold, 16 via Normal)
+        add_horizontal_rule()
+
+        # --- "Երգեր՝" title (bold, 16) ---
+        add_bold_line("Երգեր՝")
+
+        # Preserve custom ordering if available
+        try:
+            songs_qs = plan.songs.all().order_by('plansong__order', 'id')
+        except Exception:
+            songs_qs = plan.songs.all()
+
+        titles = []
+        for s in songs_qs:
+            title = getattr(s, 'song_title', None) or getattr(s, 'title', None) or str(s)
+            titles.append(title)
+
+        if titles:
+            for t in titles:
+                p = doc.add_paragraph(t, style='List Number')  # numbered list items
+                # Ensure numbering items are Calibri 16 (inherits from Normal, but set explicitly for safety)
+                for r in p.runs:
+                    r.bold = False
+                    r.font.name = 'Calibri'
+                    r.font.size = Pt(16)
+        else:
+            p = doc.add_paragraph('—')
+            for r in p.runs:
+                r.bold = False
+                r.font.name = 'Calibri'
+                r.font.size = Pt(16)
+
+        # Serialize to bytes
+        buf = BytesIO()
+        doc.save(buf)
+        buf.seek(0)
+
+        resp = HttpResponse(
+            buf.getvalue(),
+            content_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
+        resp['Content-Disposition'] = f'attachment; filename="Plan_{plan.date}_summary.docx"'
+        return resp
 
 
 

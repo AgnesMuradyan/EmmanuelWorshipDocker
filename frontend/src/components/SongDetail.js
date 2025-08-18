@@ -1,67 +1,68 @@
 import React, { useState, useEffect } from 'react';
-import {Link, useParams} from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import './SongDetail.css';
+import './PlanDetail.css';
 import logo from "./logo.png";
 
-const SongDetail = () => {
+const PlanDetail = () => {
   const { id } = useParams();
-  const [song, setSong] = useState(null);
+  const [plan, setPlan] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    axios.get(`https://emmanuel-worship-backend.onrender.com/api/songs/${id}/`)
-      .then(response => setSong(response.data))
-      .catch(error => console.error('There was an error fetching the song!', error));
+    axios.get(`https://emmanuel-worship-backend.onrender.com/api/plans/${id}/`)
+      .then(response => setPlan(response.data))
+      .catch(error => console.error('There was an error fetching the plan!', error));
   }, [id]);
-
-  if (!song) return <div className="loading">Loading...</div>;
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
 
-  const downloadChords = () => {
-    axios.get(`https://emmanuel-worship-backend.onrender.com/api/songs/${id}/view-chords/`, { responseType: 'blob' })
+  const downloadConcatenatedPowerpoint = () => {
+    axios.get(`http://localhost:8000/api/plans/${id}/download-concatenated-powerpoint/`, { responseType: 'blob' })
       .then(response => {
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+          })
+        );
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `${song.title}_chords.pdf`);
+        link.setAttribute('download', `Plan_${plan.date}_concatenated_powerpoint.pptx`);
         document.body.appendChild(link);
         link.click();
         link.remove();
       })
-      .catch(error => console.error('There was an error downloading the chords!', error));
+      .catch(error => console.error('There was an error downloading the concatenated PowerPoint!', error));
   };
 
-  const downloadPowerpoint = () => {
-    axios.get(`https://emmanuel-worship-backend.onrender.com/api/songs/${id}/view-powerpoint/`, { responseType: 'blob' })
+  // NEW: download DOCX summary (date -> lead singers -> singers -> songs)
+  const downloadSummaryDocx = () => {
+    axios.get(`http://localhost:8000/api/plans/${id}/download-summary-docx/`, { responseType: 'blob' })
       .then(response => {
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }));
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          })
+        );
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', `${song.title}_powerpoint.pptx`);
+        link.setAttribute('download', `Plan_${plan.date}_summary.docx`);
         document.body.appendChild(link);
         link.click();
         link.remove();
       })
-      .catch(error => console.error('There was an error downloading the PowerPoint!', error));
+      .catch(error => console.error('There was an error downloading the DOCX summary!', error));
   };
 
-  const printSong = () => {
-    const printContent = `
-      <div style="font-size: 26px; font-weight: bold; text-align: center;">${song.title}</div>
-      <pre style="font-size: 22px; white-space: pre-wrap; margin-top: 20px;">${song.verse}</pre>
-    `;
-    const newWindow = window.open('', '', 'width=600,height=400');
-    newWindow.document.write(printContent);
-    newWindow.document.close();
-    newWindow.print();
-  };
+  if (!plan) return <div className="loading">Loading...</div>;
+
+  // Sort the PlanSong objects based on the order
+  const sortedSongs = [...plan.songs].sort((a, b) => a.order - b.order);
 
   return (
-      <div className="song-detail">
+      <div className="plan-detail">
           <nav className="navbar">
               <div className="navbar-brand">
                   <img src={logo} alt="EmmanuelWorship Logo" className="logo"/>
@@ -75,39 +76,57 @@ const SongDetail = () => {
                   <Link to="/songs" className="nav-link">Երգեր</Link>
               </div>
           </nav>
-          <h1 className="song-title">{song.title}</h1>
-          <pre className="song-verse">{song.verse}</pre>
-          <p className="song-key">Original Key: <span>{song.original_key}</span></p>
-          <p className="song-link">
-              Original Link:
-              <a href={song.original_link} target="_blank" rel="noopener noreferrer">
-                  {song.original_link}
-              </a>
-          </p>
-          {song.chords ? (
-              <div className="chords-container">
-                  <iframe
-                      src={`https://emmanuel-worship-backend.onrender.com/api/songs/${id}/view-chords/`}
-                      className="chords-iframe"
-                      title="Chords"
-                      frameBorder="0"
-                      scrolling="auto"
-                      allowFullScreen
-                  ></iframe>
-              </div>
-          ) : (
-              <p className="no-chords">No chords available</p>
-          )}
-          <div className="buttons">
-              <button className="download-button" onClick={downloadChords}>Ներբեռնել նոտաները</button>
-              <button className="download-button" onClick={downloadPowerpoint}>Ներբեռնել սլայդը</button>
-              <button className="print-button" onClick={printSong}>Տպել երգը</button>
+
+          <h1 className="plan-date">Ծրագիր {plan.date}</h1>
+
+          <div className="section">
+              <h2 className="section-title">Վարողներ</h2>
+              <ul className="list">
+                  {plan.lead_singers.map(singer => (
+                      <li key={singer.id} className="list-item">{singer.first_name} {singer.last_name}</li>
+                  ))}
+              </ul>
           </div>
-          <p className="song-date">Ստեղծվել է: <span>{new Date(song.created_at).toLocaleDateString()}</span></p>
-          <p className="song-date">Փոփոխվել է: <span>{new Date(song.updated_at).toLocaleDateString()}</span></p>
+
+          <div className="section">
+              <h2 className="section-title">Վոկալ</h2>
+              <ul className="list">
+                  {plan.singers.map(singer => (
+                      <li key={singer.id} className="list-item">{singer.first_name} {singer.last_name}</li>
+                  ))}
+              </ul>
+          </div>
+
+          <div className="section">
+              <h2 className="section-title">Երաժիշտներ</h2>
+              <ul className="list">
+                  {plan.musicians.map(musician => (
+                      <li key={musician.id} className="list-item">{musician.first_name} {musician.last_name}</li>
+                  ))}
+              </ul>
+          </div>
+
+          <div className="section">
+              <h2 className="section-title">Երգեր</h2>
+              <ul className="list">
+                  {sortedSongs.map(planSong => (
+                      <li key={planSong.id} className="list-item">
+                          <Link to={`/songs/${planSong.song_id}`} className="song-link">{planSong.song_title}</Link>
+                      </li>
+                  ))}
+              </ul>
+          </div>
+
+          <div className="download-actions">
+              <button className="download-button" onClick={downloadConcatenatedPowerpoint}>
+                  Ներբեռնել միակցված սլայդը
+              </button>
+              <button className="download-button" onClick={downloadSummaryDocx}>
+                  Ներբեռնել ծրագիրը (DOCX)
+              </button>
+          </div>
       </div>
   );
 };
 
-export default SongDetail;
-
+export default PlanDetail;
