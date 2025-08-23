@@ -229,8 +229,9 @@ class PlanViewSet(viewsets.ModelViewSet):
         add_bold_line(date_str)
 
         # --- Վարողներ (lead singers) ---
-        lead_text = comma_join(full_names(plan.lead_singers.all()))
-        add_label_value('Վարողներ', lead_text)
+        lead_qs = plan.planleadsinger_set.select_related('singer').order_by('order')
+        lead_names = [f"{pls.singer.first_name} {pls.singer.last_name}".strip() for pls in lead_qs]
+        add_label_value('Վարողներ', ', '.join(lead_names) if lead_names else '—')
 
         # --- Վոկալ (singers) ---
         vocal_text = comma_join(full_names(plan.singers.all()))

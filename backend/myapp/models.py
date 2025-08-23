@@ -140,10 +140,15 @@ class Plan(models.Model):
     concatenated_powerpoint = models.BinaryField(null=True, blank=True)
     day_type = models.CharField(max_length=2, choices=DAY_TYPE_CHOICES, default=OTHER)
 
-    lead_singers = models.ManyToManyField('Singer', related_name='lead_plans', null=True, blank=True)
-    singers = models.ManyToManyField('Singer', related_name='plans', null=True, blank=True)
-    musicians = models.ManyToManyField('Musician', related_name='plans', null=True, blank=True)
-    songs = models.ManyToManyField(Song, through='PlanSong', related_name='plans', null=True, blank=True)
+    lead_singers = models.ManyToManyField(
+        'Singer',
+        through='PlanLeadSinger',
+        related_name='lead_plans',
+        blank=True,
+    )
+    singers = models.ManyToManyField('Singer', related_name='plans', blank=True)
+    musicians = models.ManyToManyField('Musician', related_name='plans', blank=True)
+    songs = models.ManyToManyField(Song, through='PlanSong', related_name='plans', blank=True)
 
     def __str__(self):
         return f"Plan for {self.date}"
@@ -206,6 +211,13 @@ class Plan(models.Model):
         print("PowerPoint presentation created successfully")
         return output.read()
 
+    lead_singers = models.ManyToManyField(
+        'Singer',
+        through='PlanLeadSinger',
+        related_name='lead_plans',
+        blank=True
+    )
+
 
 class PlanSong(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)
@@ -228,3 +240,27 @@ class PlanSong(models.Model):
 
     # def __str__(self):
     #     return f"{self.plan} - {self.song} (Order: {self.order})"
+
+
+
+class PlanLeadSinger(models.Model):
+    plan = models.ForeignKey('Plan', on_delete=models.CASCADE)
+    singer = models.ForeignKey(Singer, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ['order']
+        constraints = [
+            UniqueConstraint(
+                fields=['plan', 'order'],
+                name='uniq_plan_lead_order',
+                deferrable=Deferrable.DEFERRED,
+            ),
+            UniqueConstraint(
+                fields=['plan', 'singer'],
+                name='uniq_plan_lead_singer',
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.plan} - {self.singer} (Order: {self.order})"

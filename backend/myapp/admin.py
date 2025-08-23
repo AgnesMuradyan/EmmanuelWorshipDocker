@@ -2,7 +2,7 @@
 from django.contrib import admin
 from django import forms
 from django.db import transaction, connections  # <-- add this
-from .models import Album, Song, Instrument, Musician, MusicianInstrument, Singer, Plan, PlanSong
+from .models import Album, Song, Instrument, Musician, MusicianInstrument, Singer, Plan, PlanSong, PlanLeadSinger
 from .serializers import SongSerializer
 
 class SongAdminForm(forms.ModelForm):
@@ -60,16 +60,33 @@ class PlanSongInline(admin.TabularInline):
     raw_id_fields = ('song',)
     ordering = ('order',)
 
+class PlanLeadSingerForm(forms.ModelForm):
+    class Meta:
+        model = PlanLeadSinger
+        fields = '__all__'
+    def validate_unique(self):
+        # allow swapping like 1↔2; DB constraint enforces at COMMIT
+        return
+
+class PlanLeadSingerInline(admin.TabularInline):
+    model = PlanLeadSinger
+    form = PlanLeadSingerForm
+    extra = 0
+    fields = ('singer', 'order')
+    raw_id_fields = ('singer',)
+    ordering = ('order',)
+
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
-    inlines = [PlanSongInline]
+    inlines = [PlanLeadSingerInline, PlanSongInline]
     list_display = ('date', 'day_type')
 
     def save_related(self, request, form, formsets, change):
-        # Defer the DB uniqueness check until COMMIT so swaps don't fail
+        from django.db import transaction, connections
         with transaction.atomic():
             with connections['default'].cursor() as cursor:
-                cursor.execute('SET CONSTRAINTS uniq_plan_order DEFERRED')
+                # Defer all deferrable constraints (covers both songs & lead-singers)
+                cursor.execute('SET CONSTRAINTS ALL DEFERRED')
             super().save_related(request, form, formsets, change)
 
 admin.site.register(Song, SongAdmin)

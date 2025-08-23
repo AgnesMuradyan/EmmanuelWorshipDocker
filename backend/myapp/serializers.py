@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from .models import (
-    Album, Song, Member, Instrument, Musician, MusicianInstrument, Singer, Plan, PlanSong
+    Album, Song, Member, Instrument, Musician, MusicianInstrument, Singer, Plan, PlanSong, PlanLeadSinger
 )
 from django import forms
 import logging
@@ -98,14 +98,23 @@ class PlanSongSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+class PlanLeadSingerSerializer(serializers.ModelSerializer):
+    singer_id = serializers.IntegerField(source='singer.id', read_only=True)
+    first_name = serializers.CharField(source='singer.first_name', read_only=True)
+    last_name = serializers.CharField(source='singer.last_name', read_only=True)
 
+    class Meta:
+        model = PlanLeadSinger
+        fields = ['id', 'order', 'singer_id', 'first_name', 'last_name']
 
 class PlanSerializer(serializers.ModelSerializer):
-    lead_singers = SingerSerializer(many=True, read_only=True)
+    lead_singers = SingerSerializer(many=True, read_only=True)  # unchanged (unordered M2M)
+    lead_singers_ordered = PlanLeadSingerSerializer(
+        many=True, read_only=True, source='planleadsinger_set'
+    )
     singers = SingerSerializer(many=True, read_only=True)
     musicians = MusicianSerializer(many=True, read_only=True)
     songs = PlanSongSerializer(many=True, source='plansong_set')
-
     concatenated_powerpoint = serializers.SerializerMethodField()
 
     class Meta:
