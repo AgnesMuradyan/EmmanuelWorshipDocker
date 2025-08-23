@@ -8,7 +8,8 @@ from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN
-
+from django.db import models
+from django.db.models import UniqueConstraint, Deferrable
 import logging
 
 logger = logging.getLogger(__name__)
@@ -212,8 +213,18 @@ class PlanSong(models.Model):
     order = models.PositiveIntegerField()
 
     class Meta:
-        unique_together = ('plan', 'order')  # Ensure each order is unique per plan
         ordering = ['order']
+        constraints = [
+            UniqueConstraint(
+                fields=['plan', 'order'],
+                name='uniq_plan_order',
+                deferrable=Deferrable.DEFERRED,
+            ),
+            UniqueConstraint(
+                fields=['plan', 'song'],
+                name='uniq_plan_song',
+            ),
+        ]
 
     # def __str__(self):
     #     return f"{self.plan} - {self.song} (Order: {self.order})"
