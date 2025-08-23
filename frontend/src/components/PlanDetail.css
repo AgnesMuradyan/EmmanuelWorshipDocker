@@ -1,187 +1,280 @@
-/* Base */
-body {
-  background-color: #E6E6FA; /* Very light purple */
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif; /* <-- fixed: no quotes around the whole stack */
+/* =========================
+   THEME (matches other pages)
+   ========================= */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Serif+Armenian:wght@600;700&display=swap');
+
+:root{
+  --c-bg: #f6f8ff;
+  --c-text: #223046;
+  --c-muted: #5b6b83;
+  --c-card: #ffffff;
+
+  --c-grad-1: #d7e6ff;
+  --c-grad-2: #f5e9ff;
+
+  --c-primary-1: #00509E;
+  --c-primary-2: #003366;
+
+  --shadow-1: 0 6px 20px rgba(0,0,0,.08);
+  --shadow-2: 0 12px 36px rgba(0,0,0,.12);
 }
 
-/* Containers */
-.plan-list-container,
-.plan-detail {
-  max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
-  background-color: #f0f8ff; /* Light blue container */
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+@media (prefers-color-scheme: dark){
+  :root{
+    --c-bg: #0f1421;
+    --c-text: #e6edff;
+    --c-muted: #b7c2d8;
+    --c-card: #2a2f3a;
+
+    --c-grad-1: #16243d;
+    --c-grad-2: #221b38;
+
+    --c-primary-1: #6aa8ff;
+    --c-primary-2: #98bfff;
+    --shadow-1: 0 10px 28px rgba(0,0,0,.45);
+    --shadow-2: 0 18px 48px rgba(0,0,0,.55);
+  }
 }
 
-/* Navbar */
-.navbar {
-  position: relative;            /* <-- ensures absolute children (mobile menu) position against navbar */
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #003366;
-  padding: 10px 20px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+* { box-sizing: border-box; }
+html, body{
+  margin:0; padding:0;
+  background: var(--c-bg); color: var(--c-text);
+  font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, 'Noto Sans', 'Noto Serif Armenian', sans-serif;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
 
-.navbar-brand {
-  display: flex;
-  align-items: center;
+/* Background gradient pattern */
+.page-bg{ position: relative; min-height:100vh; overflow-x:hidden; }
+.bg-pattern{ position: fixed; inset:0; width:100%; height:100%; z-index:-1; }
+
+/* Container with glass */
+.plan-detail-container{
+  max-width: 980px; margin: 32px auto 48px; padding: 20px;
+}
+.glass{
+  background: color-mix(in oklab, var(--c-card) 72%, transparent);
+  border-radius: 18px; backdrop-filter: saturate(140%) blur(10px);
+  box-shadow: var(--shadow-1);
+  border: 1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
+  animation: fadeIn .45s ease both;
 }
 
-.logo {
-  height: 40px;
-  margin-right: 10px;
-  /* color removed — has no effect on raster images */
-  /* If using an inline SVG, you can target .logo svg { fill: #fff; } */
+/* =========================
+   NAVBAR
+   ========================= */
+.navbar{
+  display:flex; justify-content:space-between; align-items:center;
+  background: linear-gradient(135deg, var(--c-primary-2), var(--c-primary-1));
+  padding:12px 16px; border-radius:14px; margin-bottom:22px;
+  position: sticky; top: 14px; z-index: 50; box-shadow: var(--shadow-2);
 }
+.navbar-brand{ display:flex; align-items:center; gap:10px; }
+.logo{ height:42px; }
+.brand-name{ font-size:1.5rem; font-weight:700; color:#fff; letter-spacing:.4px; }
+.menu-icon{ font-size:1.9rem; color:#fff; cursor:pointer; display:none; z-index:1000; }
+.nav-links{ display:flex; gap:18px; }
+.nav-link{ color:#fff; text-decoration:none; font-weight:700; padding:8px 12px; border-radius:10px; transition:.25s; }
+.nav-link:hover, .nav-link:focus-visible{ background-color: rgba(255,255,255,.17); outline:none; }
 
-.brand-name {
-  font-size: 1.5rem;
-  color: #ffffff;
+/* =========================
+   HEADER
+   ========================= */
+.header-stack{ display:grid; gap:10px; align-items:center; }
+.plan-date{
+  font-family:'Noto Serif Armenian', serif;
+  font-size: clamp(1.9rem, 1.5rem + 2vw, 2.7rem);
+  text-align:center; margin: 8px 0 2px;
+  color: var(--c-primary-2); font-weight:800; letter-spacing:.5px;
 }
+.chip-row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+.chip{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 12px; border-radius:999px; font-weight:600; font-size:.92rem;
+  border:1px solid color-mix(in oklab, var(--c-primary-1) 10%, var(--c-muted));
+  background: color-mix(in oklab, var(--c-card) 70%, transparent);
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+.chip-type{ background:#e9f2ff; color:#0a4fb3; border-color:#cfe2ff; }
+.chip.muted{ color: var(--c-muted); }
 
-.menu-icon {
-  font-size: 1.5rem;
-  color: #ffffff;
-  cursor: pointer;
-  display: none;
+/* =========================
+   SECTIONS & CARDS
+   ========================= */
+.section{ margin-top: 16px; }
+.card{
+  background: color-mix(in oklab, var(--c-card) 85%, transparent);
+  border: 1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
+  border-radius: 16px; box-shadow: var(--shadow-1);
+  padding: 14px;
 }
+.section-title{ margin: 0 0 10px; font-size: 1.05rem; font-weight: 800; letter-spacing:.3px; color: var(--c-primary-2); }
+.section-title-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
 
-/* Nav links */
-.nav-links {
-  display: flex;
-  gap: 20px;
+/* People: leaders list (vertical) */
+.people-list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.person{
+  display:flex; gap:10px; align-items:center;
+  background: color-mix(in oklab, var(--c-card) 70%, transparent);
+  border:1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
+  border-radius:12px; padding:10px;
 }
+.avatar{
+  display:flex; align-items:center; justify-content:center;
+  min-width:44px; min-height:44px; border-radius:10px;
+  background: linear-gradient(180deg, var(--c-primary-1), var(--c-primary-2));
+  color:#fff; font-weight:900; letter-spacing:.3px;
+}
+.person-main{ display:grid; gap:2px; }
+.person-name{ font-weight:800; }
+.person-sub{ font-size:.85rem; color: var(--c-muted); }
 
-.nav-link {
-  color: #ffffff;
-  text-decoration: none;
-  font-size: 1.2rem;
-  padding: 10px 15px;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
+/* People: singers/musicians grid */
+.people-grid{ list-style:none; margin:0; padding:0; display:grid; gap:10px; grid-template-columns: repeat(3, minmax(0,1fr)); }
+.person-tile{
+  display:flex; align-items:center; gap:8px;
+  background: color-mix(in oklab, var(--c-card) 70%, transparent);
+  border:1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
+  border-radius:12px; padding:10px;
 }
+.avatar.sm{ min-width:38px; min-height:38px; border-radius:10px; }
+.tile-name{ font-weight:700; }
 
-.nav-link:hover,
-.nav-link:focus-visible {
-  background-color: #00509E;
-  text-decoration: none;
-  outline: none;
+/* Songs (ordered list) */
+.song-ordered{ counter-reset: song; list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.song-row{
+  display:grid; grid-template-columns: 56px 1fr; align-items:center; gap:12px;
+  background: color-mix(in oklab, var(--c-card) 70%, transparent);
+  border:1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
+  border-radius:12px; padding:10px;
 }
+.song-order{
+  display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(135deg, var(--c-primary-1), var(--c-primary-2));
+  color:#fff; font-weight:900; border-radius:10px; min-height:40px;
+}
+.song-main{ display:grid; gap:6px; }
+.song-link{ font-weight:800; color: var(--c-primary-1); text-decoration:none; }
+.song-link:hover, .song-link:focus-visible{ text-decoration: underline; outline:none; }
+.song-sub{ display:flex; gap:8px; flex-wrap:wrap; }
+.meta-chip{
+  padding:4px 8px; border-radius:999px; font-size:.82rem; font-weight:700;
+  background:#eef3ff; color:#1a4fb3;
+}
+.meta-chip.key{ background:#e7fbf0; color:#136c3e; }
+.meta-chip.album{ background:#efe7ff; color:#6d2db8; }
 
-/* Plan detail */
-.plan-date {
-  font-size: 2.5rem;
-  color: #003366;
-  text-align: center;
-  margin-bottom: 20px;
+/* Actions (base button styles) */
+.btn{
+  background: var(--c-primary-2); color:#fff; border:none;
+  padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:800; transition:.2s;
 }
+.btn:hover, .btn:focus-visible{ background: var(--c-primary-1); outline:none; }
+.btn-outline{
+  background: transparent; color: var(--c-primary-2);
+  border: 2px solid var(--c-primary-2);
+}
+.btn-outline:hover{ color:#fff; background: var(--c-primary-2); }
+.btn-ghost{
+  background: transparent; color: var(--c-primary-1);
+  border:1px dashed color-mix(in oklab, var(--c-primary-1) 40%, var(--c-card));
+}
+.btn-ghost:hover{ background: color-mix(in oklab, var(--c-card) 80%, transparent); }
 
-.section {
-  background-color: #ffffff;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 15px;
-  margin-bottom: 20px;
+/* Empty & Error */
+.empty{
+  text-align:center; padding:24px; background: color-mix(in oklab, var(--c-card) 80%, transparent);
+  border-radius:12px; border:1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
 }
+.empty-illustration{ font-size:2rem; margin-bottom:8px; }
 
-.section-title {
-  font-size: 1.5rem;
-  color: #003366;
-  margin-bottom: 10px;
+.error-card{
+  display:flex; align-items:center; gap:14px; padding:16px; border-radius:14px;
+  background:#fff1f0; border:1px solid #ffd6d6; color:#991b1b; margin-bottom:10px;
 }
+.err-icon{ font-size:1.6rem; }
 
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+/* Skeleton */
+.skeleton-card{ position:relative; overflow:hidden; min-height: 140px; }
+.skeleton-card::after{
+  content:""; position:absolute; inset:0;
+  background: linear-gradient(100deg, transparent 40%, rgba(255,255,255,.28) 50%, transparent 60%);
+  animation: shimmer 1.2s infinite;
 }
-
-.list-item {
-  font-size: 1.2rem;
-  color: #333;
-  padding: 5px 0;
-}
-
-/* Links to songs */
-.song-link {
-  color: #6A5ACD; /* Dark Slate Blue */
-  text-decoration: none;
-}
-
-.song-link:hover,
-.song-link:focus-visible {
-  text-decoration: underline;
-  outline: none;
-}
-
-/* Download buttons */
-.download-actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;          /* Wrap on smaller widths */
-  margin-top: 20px;
-}
-
-.download-button {
-  background-color: #003366;
-  color: #ffffff;
-  border: none;
-  padding: 10px 16px;
-  font-size: 1rem;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-  text-align: center;
-  min-width: 240px;         /* Keeps a nice button width on desktop */
-}
-
-.download-button:hover,
-.download-button:focus-visible {
-  background-color: #6A5ACD; /* Dark Slate Blue on hover/focus */
-  outline: none;
-}
-
-.loading {
-  text-align: center;
-  font-size: 1.5rem;
-  color: #003366;
-}
+.sk-title{ height: 28px; width: 60%; border-radius: 12px; background:#e8edf7; margin: 10px; }
+.sk-lines{ padding: 0 10px 14px; display:grid; gap:10px; }
+.sk-line{ height: 14px; border-radius: 8px; background:#e8edf7; }
+.w60{ width:60%; } .w80{ width:80%; } .w90{ width:90%; }
+@keyframes shimmer{ from{ transform: translateX(-100%);} to{ transform: translateX(100%);} }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .menu-icon {
-    display: block;
+@media (max-width: 900px){ .people-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+@media (max-width: 780px){
+  .menu-icon{ display:block; }
+  .nav-links{
+    display:none; flex-direction:column; gap:12px; background: var(--c-primary-2);
+    position:absolute; top:60px; left:0; width:100%; padding:20px;
+    border-radius: 0 0 12px 12px; box-shadow: var(--shadow-2); z-index:999;
   }
+  .nav-links.active{ display:flex; }
+  .song-row{ grid-template-columns: 48px 1fr; }
+  .avatar{ min-width:40px; min-height:40px; }
+}
 
-  .nav-links {
-    display: none;                 /* hidden by default on mobile */
-    flex-direction: column;
-    gap: 10px;
-    background-color: #003366;
-    position: absolute;
-    top: 60px;                     /* below the navbar */
-    left: 0;
+/* A11y & Animations */
+@keyframes fadeIn{ from{ opacity:0; transform: translateY(10px);} to{ opacity:1; transform: translateY(0);} }
+:focus-visible{ outline: 3px solid color-mix(in oklab, var(--c-primary-1) 35%, transparent); outline-offset: 2px; }
+
+/* =======================================================
+   ACTIONS LAYOUT (two buttons centered, back link below)
+   ======================================================= */
+
+/* Container for actions; column to allow a second row */
+.section.actions-card{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Top row: keep two buttons on one centered line on desktop */
+.section.actions-card .actions-row-top{
+  display: grid;
+  grid-auto-flow: column;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Back link row: centered */
+.section.actions-card .actions-row-bottom{
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+/* Ensure no stray margins push items to the right */
+.section.actions-card .actions-row-top > *,
+.section.actions-card .actions-row-bottom > *{
+  margin: 0;
+  justify-self: center;
+}
+
+/* Mobile: stack buttons but keep centered and tidy */
+@media (max-width: 600px){
+  .section.actions-card .actions-row-top{
+    grid-auto-flow: row;
+  }
+  .section.actions-card .actions-row-top .btn{
     width: 100%;
-    padding: 20px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+    max-width: 320px;
   }
+}
 
-  .nav-links.active {
-    display: flex;                 /* shown when toggled */
-  }
-
-  .download-button {
-    width: 100%;                   /* Full-width buttons on small screens */
-    min-width: 0;
-  }
+/* Hard-centering guardrails in case of inherited right alignment */
+.section.actions-card,
+.section.actions-card .actions-row-top,
+.section.actions-card .actions-row-bottom{
+  text-align: center !important;
 }

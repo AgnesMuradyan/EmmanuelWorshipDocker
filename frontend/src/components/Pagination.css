@@ -1,11 +1,23 @@
-/* Pagination (matches your blue palette) */
+/* Theming via CSS variables */
 .pg-root {
+  --pg-bg: #e0e0e0;        /* bright gray background */
+  --pg-bg-hover: #cfcfcf;  /* slightly darker on hover */
+  --pg-fg: #222;           /* dark text for contrast */
+  --pg-ghost: #666;        /* medium gray for ghost/ellipsis */
+  --pg-focus-outer: rgba(0,0,0,.25);
+  --pg-focus-inner: #999;
+
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
   margin-top: 20px;
+  flex-wrap: wrap;
 }
+
+.pg-root.size-sm { --pad-y: 6px; --pad-x: 10px; --fs: .9rem; }
+.pg-root.size-md { --pad-y: 10px; --pad-x: 14px; --fs: 1rem; }
+.pg-root.size-lg { --pad-y: 12px; --pad-x: 18px; --fs: 1.1rem; }
 
 .pg-list {
   display: flex;
@@ -18,57 +30,91 @@
 
 /* Arrows + numbers share the same look */
 .pg-btn,
-.pg-num {
+.pg-num,
+.pg-ellipsis-btn {
   appearance: none;
   border: none;
-  background: #003366;     /* your base blue */
-  color: #ffffff;
-  padding: 10px 14px;
+  background: var(--pg-bg);
+  color: var(--pg-fg);
+  padding: var(--pad-y, 10px) var(--pad-x, 14px);
   border-radius: 999px;
-  font-size: 1rem;
+  font-size: var(--fs, 1rem);
   line-height: 1;
   cursor: pointer;
   transition: background-color .15s ease, transform .06s ease, box-shadow .15s ease;
 }
 
 .pg-btn:hover:not(:disabled),
-.pg-num:hover {
-  background: #00509E;     /* your hover blue */
+.pg-num:hover,
+.pg-ellipsis-btn:hover {
+  background: var(--pg-bg-hover);
 }
 
 .pg-btn:active,
-.pg-num:active {
+.pg-num:active,
+.pg-ellipsis-btn:active {
   transform: translateY(1px);
 }
 
+/* Current page */
+.pg-num.active {
+  background: var(--pg-bg-hover);
+  box-shadow: 0 0 0 2px var(--pg-focus-outer) inset;
+  font-weight: 700;
+}
+
+/* Ellipsis presented as a small ghost pill */
+.pg-ellipsis-btn {
+  background: transparent;
+  color: var(--pg-ghost);
+  border: 2px dashed var(--pg-ghost);
+  padding: calc(var(--pad-y,10px) - 4px) calc(var(--pad-x,14px) - 4px);
+}
+.pg-ellipsis { padding: 0; }
+
+/* Disabled arrows */
 .pg-btn:disabled {
   opacity: .5;
   cursor: not-allowed;
 }
 
-/* Current page */
-.pg-num.active {
-  background: #00509E;     /* active matches your hover */
-  box-shadow: 0 0 0 2px rgba(0,80,158,.25) inset;
-}
-
-/* Ellipsis between ranges */
-.pg-ellipsis {
-  color: #003366;
-  padding: 0 6px;
-  user-select: none;
-}
-
 /* Keyboard focus ring */
 .pg-btn:focus-visible,
-.pg-num:focus-visible {
+.pg-num:focus-visible,
+.pg-ellipsis-btn:focus-visible {
   outline: none;
   box-shadow:
-    0 0 0 3px rgba(0,80,158,.35),  /* outer ring in your blue */
-    0 0 0 2px #00509E inset;       /* inner accent */
+    0 0 0 3px var(--pg-focus-outer),
+    0 0 0 2px var(--pg-focus-inner) inset;
 }
 
 /* Compact on small screens */
 @media (max-width: 480px) {
-  .pg-btn, .pg-num { padding: 8px 10px; }
+  .pg-btn, .pg-num, .pg-ellipsis-btn {
+    padding: 8px 10px;
+    font-size: .95rem;
+  }
+}
+
+/* Ultra narrow: hide double arrows (keep prev/next) */
+@media (max-width: 360px) {
+  .pg-root > .pg-btn:first-of-type,    /* « */
+  .pg-root > .pg-btn:last-of-type {    /* » */
+    display: none;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .pg-btn, .pg-num, .pg-ellipsis-btn {
+    transition: none;
+  }
+}
+
+/* Optional total indicator */
+.pg-total {
+  color: var(--pg-ghost);
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 999px;
 }
