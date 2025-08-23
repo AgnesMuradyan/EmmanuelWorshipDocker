@@ -364,8 +364,10 @@ class PlanSongViewSet(viewsets.ModelViewSet):
 def create_slide_dl(request):
     try:
         text = request.GET.get("text", "")
-        build_font = request.GET.get("font", "Arial Armenian")   # font used while building
-        final_font = request.GET.get("final_font", "Agg-Book1")  # forced at the end
+
+        # build using legacy Arial*; then force Agg-Book1 at the end
+        build_font = request.GET.get("font", "Arial Armenian")
+        final_font = request.GET.get("final_font", "Agg_Book1")
 
         try:
             from pptx import Presentation
@@ -377,7 +379,7 @@ def create_slide_dl(request):
         except Exception as e:
             return HttpResponse(f"python-pptx not available: {e}", status=500, content_type="text/plain; charset=utf-8")
 
-        # ---- Unicode -> ArmSCII-8 bytes -> Latin-1 (with «→§ and »→¦) ----
+        # ---------- Unicode -> ArmSCII-8 bytes -> Latin-1 (with «→§, »→¦) ----------
         def unicode_to_armscii8_latin1(s: str) -> str:
             s = normalize("NFC", s)
             if not hasattr(unicode_to_armscii8_latin1, "_map"):
@@ -393,15 +395,9 @@ def create_slide_dl(request):
                 for up, lo in pairs:
                     m[ord(up)] = code; code += 1
                     m[ord(lo)] = code; code += 1
-                m[ord('և')] = 0xA2
-                m[ord('։')] = 0xA3
-                m[ord('՝')] = 0xAA
-                m[ord('֊')] = 0xAD
-                m[ord('…')] = 0xAE
-                m[ord('՜')] = 0xAF
-                m[ord('՛')] = 0xB0
-                m[ord('՞')] = 0xB1
-                m[ord('՚')] = 0xFE
+                m[ord('և')] = 0xA2; m[ord('։')] = 0xA3; m[ord('՝')] = 0xAA
+                m[ord('֊')] = 0xAD; m[ord('…')] = 0xAE; m[ord('՜')] = 0xAF
+                m[ord('՛')] = 0xB0; m[ord('՞')] = 0xB1; m[ord('՚')] = 0xFE
                 unicode_to_armscii8_latin1._map = m
 
             out = bytearray(); mp = unicode_to_armscii8_latin1._map
@@ -414,12 +410,12 @@ def create_slide_dl(request):
                 elif cp == 0x00BB:      # »
                     out.append(0xA6)     # ¦
                 elif cp <= 0xFF:
-                    out.append(cp)       # pass other Latin-1
+                    out.append(cp)
                 else:
                     out.append(ord('?'))
             return out.decode("latin-1")
 
-        # ---- helpers (fonts/theme) ----
+        # ---------- helpers ----------
         def _set_rfonts(el, name: str):
             rFonts = el.find(qn('a:rFonts'))
             if rFonts is None:
@@ -450,21 +446,35 @@ def create_slide_dl(request):
             except Exception:
                 pass
 
-        # ---- parse input (2 lines per slide) ----
-        raw_lines = [normalize("NFC", ln.strip())
-                     for ln in text.replace("\r\n","\n").split("\n") if ln.strip()]
-        legacy_lines = [unicode_to_armscii8_latin1(ln) for ln in raw_lines]
-        chunks = [legacy_lines[i:i+2] for i in range(0, len(legacy_lines), 2)] or [[""]]
+        # ---------- stanza-aware splitting (restart pairing at blank lines) ----------
+        raw_lines_all = text.replace("\r\n", "\n").split("\n")
+        stanzas, cur = [], []
+        for raw in raw_lines_all:
+            if raw.strip() == "":
+                if cur:
+                    stanzas.append(cur); cur = []
+            else:
+                cur.append(unicode_to_armscii8_latin1(normalize("NFC", raw.strip())))
+        if cur:
+            stanzas.append(cur)
+
+        # chunk each stanza into 2-line slides; leftover 1 line gets its own slide
+        chunks = []
+        for stanza in stanzas:
+            for i in range(0, len(stanza), 2):
+                chunks.append(stanza[i:i+2])
+        if not chunks:
+            chunks = [[""]]
 
         prs = Presentation()
         prs.slide_width = Inches(23.00)
         prs.slide_height = Inches(12.00)
 
-        # first: EMPTY slide 1
-        s = prs.slides.add_slide(prs.slide_layouts[5])
-        bg = s.background.fill; bg.solid(); bg.fore_color.rgb = RGBColor(0,0,0)
+        # empty first slide
+        s0 = prs.slides.add_slide(prs.slide_layouts[5])
+        bg = s0.background.fill; bg.solid(); bg.fore_color.rgb = RGBColor(0,0,0)
 
-        # use build_font while composing
+        # build with the chosen legacy font
         _override_theme_fonts(prs, build_font)
 
         # content slides
@@ -485,8 +495,7 @@ def create_slide_dl(request):
                     p.space_before = Pt(0); p.space_after = Pt(0)
                 except Exception:
                     pass
-                r = p.add_run()
-                r.text = s
+                r = p.add_run(); r.text = s
                 r.font.name = build_font
                 r.font.size = Pt(81)
                 r.font.bold = True
@@ -497,26 +506,23 @@ def create_slide_dl(request):
             if len(chunk) > 1:
                 add_line(chunk[1])
 
-        # last: EMPTY slide
-        s2 = prs.slides.add_slide(prs.slide_layouts[5])
-        bg2 = s2.background.fill; bg2.solid(); bg2.fore_color.rgb = RGBColor(0,0,0)
+        # empty last slide
+        slast = prs.slides.add_slide(prs.slide_layouts[5])
+        bg2 = slast.background.fill; bg2.solid(); bg2.fore_color.rgb = RGBColor(0,0,0)
 
-        # ---- FINAL PASS: force EVERYTHING to final_font (Agg-Book1) ----
+        # ---------- final pass: force EVERYTHING to Agg-Book1 ----------
         _override_theme_fonts(prs, final_font)
         for slide in prs.slides:
             for shape in slide.shapes:
-                # text frames on shapes/placeholders
                 if hasattr(shape, "has_text_frame") and shape.has_text_frame:
                     tf = shape.text_frame
-                    # set default char props too
                     txBody = tf._txBody
                     lstStyle = txBody.find(qn('a:lstStyle')) or OxmlElement('a:lstStyle')
                     if lstStyle.getparent() is None: txBody.append(lstStyle)
                     defRPr = lstStyle.find(qn('a:defRPr')) or OxmlElement('a:defRPr')
                     if defRPr.getparent() is None: lstStyle.append(defRPr)
                     _set_rfonts(defRPr, final_font)
-                    defRPr.set('sz', str(int(81 * 100)))
-                    defRPr.set('b', '1')
+                    defRPr.set('sz', str(int(81 * 100))); defRPr.set('b', '1')
                     for p in tf.paragraphs:
                         for run in p.runs:
                             run.font.name = final_font
@@ -524,7 +530,6 @@ def create_slide_dl(request):
                             run.font.bold = True
                             run.font.color.rgb = RGBColor(255,255,255)
                             _set_rfonts(run._r.get_or_add_rPr(), final_font)
-                # tables (cells have text frames)
                 if hasattr(shape, "has_table") and shape.has_table:
                     for row in shape.table.rows:
                         for cell in row.cells:
@@ -537,7 +542,7 @@ def create_slide_dl(request):
                                     run.font.color.rgb = RGBColor(255,255,255)
                                     _set_rfonts(run._r.get_or_add_rPr(), final_font)
 
-        # ---- return file ----
+        # return file
         from io import BytesIO
         from time import strftime
         buf = BytesIO(); prs.save(buf); buf.seek(0)
