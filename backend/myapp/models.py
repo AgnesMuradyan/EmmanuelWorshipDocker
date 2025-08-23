@@ -61,6 +61,9 @@ class Instrument(models.Model):
 class Musician(Member):
     instruments = models.ManyToManyField(Instrument, through='MusicianInstrument', related_name='musicians')
 
+    class Meta:
+        # Alphabetical by last name, then first name (tweak if you prefer first_name first)
+        ordering = ['first_name', 'last_name']
 
 class MusicianInstrument(models.Model):
     musician = models.ForeignKey(Musician, related_name='musician_instruments', on_delete=models.CASCADE)
@@ -68,6 +71,7 @@ class MusicianInstrument(models.Model):
 
     def __str__(self):
         return f"{self.musician} plays {self.instrument}"
+
 
 
 class Singer(Member):
@@ -79,9 +83,14 @@ class Singer(Member):
     ]
     role = models.CharField(max_length=2, choices=ROLE_CHOICES)
 
+    class Meta:
+        # Alphabetical by last name, then first name (tweak if you prefer first_name first)
+        ordering = ['first_name', 'last_name']
+
     def __str__(self):
         role_str = "Soloist" if self.role == self.SOLOIST else "Choir"
         return f"{self.first_name} {self.last_name} - {role_str}"
+
 
 
 # class Plan(models.Model):

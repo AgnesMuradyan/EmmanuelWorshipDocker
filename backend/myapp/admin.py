@@ -81,11 +81,16 @@ class PlanAdmin(admin.ModelAdmin):
     inlines = [PlanLeadSingerInline, PlanSongInline]
     list_display = ('date', 'day_type')
 
+    def formfield_for_manytomany(self, db_field, request, **kwargs):
+        from .models import Singer
+        if db_field.name in ('singers', 'lead_singers'):
+            kwargs['queryset'] = Singer.objects.order_by('first_name', 'last_name')
+        return super().formfield_for_manytomany(db_field, request, **kwargs)
+
     def save_related(self, request, form, formsets, change):
         from django.db import transaction, connections
         with transaction.atomic():
             with connections['default'].cursor() as cursor:
-                # Defer all deferrable constraints (covers both songs & lead-singers)
                 cursor.execute('SET CONSTRAINTS ALL DEFERRED')
             super().save_related(request, form, formsets, change)
 
