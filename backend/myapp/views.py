@@ -12,6 +12,9 @@ from .serializers import (
     SingerSerializer,
     PlanSerializer, PlanSongSerializer
 )
+from django.http import HttpResponse
+from django.views.decorators.http import require_GET
+from unicodedata import normalize
 from django.shortcuts import render, get_object_or_404
 from rest_framework.views import APIView
 from rest_framework import viewsets
@@ -31,6 +34,21 @@ from docx import Document
 from docx.shared import Pt
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+# views.py
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from unicodedata import normalize
+
+# pptx bits (already used elsewhere in your project)
+from pptx import Presentation
+from pptx.util import Inches, Pt
+from pptx.dml.color import RGBColor
+from pptx.enum.text import PP_ALIGN
+# views.py
+from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
+ALLOWED_ORIGIN = "*"  # or set to "http://localhost:3000" for stricter dev
+
 
 def index(request):
     return render(request, 'index.html')
@@ -339,3 +357,197 @@ class PlanSongViewSet(viewsets.ModelViewSet):
 #         song = get_object_or_404(Song, pk=pk)
 #         serializer = SongSerializer(song)
 #         return Response(serializer.data)
+
+
+
+@require_GET
+def create_slide_dl(request):
+    try:
+        text = request.GET.get("text", "")
+        build_font = request.GET.get("font", "Arial Armenian")   # font used while building
+        final_font = request.GET.get("final_font", "Agg-Book1")  # forced at the end
+
+        try:
+            from pptx import Presentation
+            from pptx.util import Inches, Pt
+            from pptx.dml.color import RGBColor
+            from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
+            from pptx.oxml.xmlchemy import OxmlElement
+            from pptx.oxml.ns import qn
+        except Exception as e:
+            return HttpResponse(f"python-pptx not available: {e}", status=500, content_type="text/plain; charset=utf-8")
+
+        # ---- Unicode -> ArmSCII-8 bytes -> Latin-1 (with «→§ and »→¦) ----
+        def unicode_to_armscii8_latin1(s: str) -> str:
+            s = normalize("NFC", s)
+            if not hasattr(unicode_to_armscii8_latin1, "_map"):
+                pairs = [
+                    ('Ա','ա'),('Բ','բ'),('Գ','գ'),('Դ','դ'),('Ե','ե'),('Զ','զ'),('Է','է'),('Ը','ը'),
+                    ('Թ','թ'),('Ժ','ժ'),('Ի','ի'),('Լ','լ'),('Խ','խ'),('Ծ','ծ'),('Կ','կ'),('Հ','հ'),
+                    ('Ձ','ձ'),('Ղ','ղ'),('Ճ','ճ'),('Մ','մ'),('Յ','յ'),('Ն','ն'),('Շ','շ'),
+                    ('Ո','ո'),('Չ','չ'),('Պ','պ'),('Ջ','ջ'),('Ռ','ռ'),('Ս','ս'),('Վ','վ'),('Տ','տ'),
+                    ('Ր','ր'),('Ց','ց'),('Ւ','ւ'),('Փ','փ'),('Ք','ք'),('Օ','օ'),('Ֆ','ֆ'),
+                ]
+                code = 0xB2
+                m = {}
+                for up, lo in pairs:
+                    m[ord(up)] = code; code += 1
+                    m[ord(lo)] = code; code += 1
+                m[ord('և')] = 0xA2
+                m[ord('։')] = 0xA3
+                m[ord('՝')] = 0xAA
+                m[ord('֊')] = 0xAD
+                m[ord('…')] = 0xAE
+                m[ord('՜')] = 0xAF
+                m[ord('՛')] = 0xB0
+                m[ord('՞')] = 0xB1
+                m[ord('՚')] = 0xFE
+                unicode_to_armscii8_latin1._map = m
+
+            out = bytearray(); mp = unicode_to_armscii8_latin1._map
+            for ch in s:
+                cp = ord(ch)
+                if cp in mp:
+                    out.append(mp[cp])
+                elif cp == 0x00AB:      # «
+                    out.append(0xA7)     # §
+                elif cp == 0x00BB:      # »
+                    out.append(0xA6)     # ¦
+                elif cp <= 0xFF:
+                    out.append(cp)       # pass other Latin-1
+                else:
+                    out.append(ord('?'))
+            return out.decode("latin-1")
+
+        # ---- helpers (fonts/theme) ----
+        def _set_rfonts(el, name: str):
+            rFonts = el.find(qn('a:rFonts'))
+            if rFonts is None:
+                rFonts = OxmlElement('a:rFonts'); el.insert(0, rFonts)
+            for key in ('ascii','hAnsi','ea','cs'):
+                rFonts.set(qn(f'a:{key}'), name)
+                theme_attr = qn(f'a:{key}Theme')
+                if theme_attr in rFonts.attrib:
+                    del rFonts.attrib[theme_attr]
+
+        def _override_theme_fonts(prs, name: str):
+            try:
+                theme = prs.part.theme_part._element
+                elems = theme.find(qn('a:themeElements')) or None
+                if elems is None: return
+                scheme = elems.find(qn('a:fontScheme')) or None
+                if scheme is None: return
+                for tag in ('a:majorFont','a:minorFont'):
+                    node = scheme.find(qn(tag)) or OxmlElement(tag)
+                    if node.getparent() is None: scheme.append(node)
+                    latin = node.find(qn('a:latin')) or OxmlElement('a:latin')
+                    if latin.getparent() is None: node.insert(0, latin)
+                    latin.set('typeface', name)
+                    for sub in ('a:ea','a:cs'):
+                        sub_el = node.find(qn(sub)) or OxmlElement(sub)
+                        if sub_el.getparent() is None: node.append(sub_el)
+                        sub_el.set('typeface', name)
+            except Exception:
+                pass
+
+        # ---- parse input (2 lines per slide) ----
+        raw_lines = [normalize("NFC", ln.strip())
+                     for ln in text.replace("\r\n","\n").split("\n") if ln.strip()]
+        legacy_lines = [unicode_to_armscii8_latin1(ln) for ln in raw_lines]
+        chunks = [legacy_lines[i:i+2] for i in range(0, len(legacy_lines), 2)] or [[""]]
+
+        prs = Presentation()
+        prs.slide_width = Inches(23.00)
+        prs.slide_height = Inches(12.00)
+
+        # first: EMPTY slide 1
+        s = prs.slides.add_slide(prs.slide_layouts[5])
+        bg = s.background.fill; bg.solid(); bg.fore_color.rgb = RGBColor(0,0,0)
+
+        # use build_font while composing
+        _override_theme_fonts(prs, build_font)
+
+        # content slides
+        for chunk in chunks:
+            slide = prs.slides.add_slide(prs.slide_layouts[5])
+            fill = slide.background.fill; fill.solid(); fill.fore_color.rgb = RGBColor(0,0,0)
+
+            tb = slide.shapes.add_textbox(Inches(1.0), Inches(0.0), Inches(21.0), prs.slide_height)
+            tf = tb.text_frame; tf.clear()
+            tf.vertical_anchor = MSO_ANCHOR.TOP
+            tf.margin_top = tf.margin_bottom = tf.margin_left = tf.margin_right = 0
+            tf.auto_size = MSO_AUTO_SIZE.NONE
+
+            def add_line(s, first=False):
+                p = tf.paragraphs[0] if first else tf.add_paragraph()
+                p.alignment = PP_ALIGN.CENTER
+                try:
+                    p.space_before = Pt(0); p.space_after = Pt(0)
+                except Exception:
+                    pass
+                r = p.add_run()
+                r.text = s
+                r.font.name = build_font
+                r.font.size = Pt(81)
+                r.font.bold = True
+                r.font.color.rgb = RGBColor(255,255,255)
+                _set_rfonts(r._r.get_or_add_rPr(), build_font)
+
+            add_line(chunk[0], first=True)
+            if len(chunk) > 1:
+                add_line(chunk[1])
+
+        # last: EMPTY slide
+        s2 = prs.slides.add_slide(prs.slide_layouts[5])
+        bg2 = s2.background.fill; bg2.solid(); bg2.fore_color.rgb = RGBColor(0,0,0)
+
+        # ---- FINAL PASS: force EVERYTHING to final_font (Agg-Book1) ----
+        _override_theme_fonts(prs, final_font)
+        for slide in prs.slides:
+            for shape in slide.shapes:
+                # text frames on shapes/placeholders
+                if hasattr(shape, "has_text_frame") and shape.has_text_frame:
+                    tf = shape.text_frame
+                    # set default char props too
+                    txBody = tf._txBody
+                    lstStyle = txBody.find(qn('a:lstStyle')) or OxmlElement('a:lstStyle')
+                    if lstStyle.getparent() is None: txBody.append(lstStyle)
+                    defRPr = lstStyle.find(qn('a:defRPr')) or OxmlElement('a:defRPr')
+                    if defRPr.getparent() is None: lstStyle.append(defRPr)
+                    _set_rfonts(defRPr, final_font)
+                    defRPr.set('sz', str(int(81 * 100)))
+                    defRPr.set('b', '1')
+                    for p in tf.paragraphs:
+                        for run in p.runs:
+                            run.font.name = final_font
+                            run.font.size = Pt(81)
+                            run.font.bold = True
+                            run.font.color.rgb = RGBColor(255,255,255)
+                            _set_rfonts(run._r.get_or_add_rPr(), final_font)
+                # tables (cells have text frames)
+                if hasattr(shape, "has_table") and shape.has_table:
+                    for row in shape.table.rows:
+                        for cell in row.cells:
+                            tf = cell.text_frame
+                            for p in tf.paragraphs:
+                                for run in p.runs:
+                                    run.font.name = final_font
+                                    run.font.size = Pt(81)
+                                    run.font.bold = True
+                                    run.font.color.rgb = RGBColor(255,255,255)
+                                    _set_rfonts(run._r.get_or_add_rPr(), final_font)
+
+        # ---- return file ----
+        from io import BytesIO
+        from time import strftime
+        buf = BytesIO(); prs.save(buf); buf.seek(0)
+        filename = f"slides_{strftime('%Y%m%d_%H%M%S')}.pptx"
+        resp = HttpResponse(
+            buf.getvalue(),
+            content_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        )
+        resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return resp
+
+    except Exception as e:
+        return HttpResponse(f"Error: {e}", status=500, content_type="text/plain; charset=utf-8")

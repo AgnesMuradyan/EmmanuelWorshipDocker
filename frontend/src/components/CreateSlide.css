@@ -1,0 +1,90 @@
+/* src/components/CreateSlide.css */
+/* Small extras; core layout/colors come from SongList.css */
+
+.create-form {
+  margin-top: 6px;
+}
+
+.textarea-input {
+  width: 100%;
+  min-height: 260px;
+  resize: vertical;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border, rgba(0,0,0,0.12));
+  outline: none;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+
+.textarea-input:focus {
+  border-color: var(--c-accent, #4158d0);
+  box-shadow: 0 6px 22px rgba(0,0,0,0.08), 0 0 0 3px rgba(65,88,208,0.12);
+}
+
+.form-foot {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.small {
+  font-size: 12px;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.counter {
+  font-variant-numeric: tabular-nums;
+  color: #6b7280;
+}
+
+.actions-row {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  background: var(--c-accent, #4158d0);
+  color: #fff;
+  border: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(65,88,208,0.28);
+}
+
+.btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--c-accent, #4158d0);
+  border: 1px solid rgba(65,88,208,0.3);
+  box-shadow: none;
+}
+
+.card.ok-card {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+  align-items: start;
+  border-radius: 14px;
+  padding: 14px;
+  background: #f0fdf4;
+  color: #065f46;
+  border: 1px solid #bbf7d0;
+}
+
+.ok-icon {
+  font-size: 20px;
+  line-height: 1;
+}
