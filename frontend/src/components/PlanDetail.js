@@ -142,6 +142,7 @@ const PlanDetail = () => {
           <div className={`nav-links ${menuOpen ? 'active' : ''}`}>
             <Link to="/plans" className="nav-link" onClick={toggleMenu}>Ծրագրեր</Link>
             <Link to="/songs" className="nav-link" onClick={toggleMenu}>Երգեր</Link>
+            <Link to="/create-slide" className="nav-link" onClick={toggleMenu}>Ստեղծել սլայդ</Link>
           </div>
         </nav>
 
