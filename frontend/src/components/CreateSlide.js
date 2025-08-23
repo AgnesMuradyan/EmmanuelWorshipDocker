@@ -5,7 +5,7 @@ import './SongList.css';
 import logo from './logo.png';
 
 // Point to your Django server:
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'https://emmanuel-worship-backend.onrender.com';
 const CREATE_SLIDE_URL = `${API_BASE}/api/create_slide_dl/`;
 const MAX_TEXT_LEN = 15000;           // keep headroom for URL length
 const SAFE_URL_LEN = 8000;            // warn if the final URL might exceed common limits
