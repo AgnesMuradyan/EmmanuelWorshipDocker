@@ -4,7 +4,9 @@ import axios from 'axios';
 import './PlanDetail.css';
 import logo from './logo.png';
 
-const API_BASE = 'https://emmanuel-worship-backend.onrender.com';
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:8000'
+  : 'https://emmanuel-worship-backend.onrender.com';
 
 const monthNames = [
   'Հունվար','Փետրվար','Մարտ','Ապրիլ','Մայիս','Հունիս',
@@ -95,6 +97,7 @@ const PlanDetail = () => {
   }, [plan?.songs]);
 
   const singers = plan?.singers ?? [];
+  const choir = plan?.choir ?? [];
   const musicians = plan?.musicians ?? [];
 
   const dayTypeChip = (() => {
@@ -213,6 +216,25 @@ const PlanDetail = () => {
               ) : (
                 <ul className="people-grid">
                   {singers.map((s) => (
+                    <li key={s.id} className="person-tile">
+                      <div className="avatar sm">{avatar(s.first_name, s.last_name)}</div>
+                      <div className="tile-name">{s.first_name} {s.last_name}</div>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            {/* Choir */}
+            <section className="section card">
+              <div className="section-title-row">
+                <h2 className="section-title">Երգչախումբ</h2>
+              </div>
+              {choir.length === 0 ? (
+                <div className="empty"><div className="empty-illustration">🎶</div>Չկան երգչախմբի անդամներ</div>
+              ) : (
+                <ul className="people-grid">
+                  {choir.map((s) => (
                     <li key={s.id} className="person-tile">
                       <div className="avatar sm">{avatar(s.first_name, s.last_name)}</div>
                       <div className="tile-name">{s.first_name} {s.last_name}</div>

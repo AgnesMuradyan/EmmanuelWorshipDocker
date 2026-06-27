@@ -150,6 +150,14 @@ class PlanViewSet(viewsets.ModelViewSet):
         singers = plan.singers.all()
         return Response({'singers': [f'{singer.first_name} {singer.last_name}' for singer in singers]})
 
+    @action(detail=True, methods=['get'], url_path='view-choir', url_name='view_choir')
+    def view_choir(self, request, pk=None):
+        plan = self.get_object()
+        if not plan.choir.exists():
+            return Response({'status': 'no choir available'}, status=status.HTTP_404_NOT_FOUND)
+        choir = plan.choir.all()
+        return Response({'choir': [f'{singer.first_name} {singer.last_name}' for singer in choir]})
+
     @action(detail=True, methods=['get'], url_path='view-lead-singers', url_name='view_lead_singers')
     def view_lead_singers(self, request, pk=None):
         plan = self.get_object()
@@ -177,7 +185,7 @@ class PlanViewSet(viewsets.ModelViewSet):
         # Prefetch to avoid N+1 queries
         plan = (
             self.get_queryset()
-            .prefetch_related('lead_singers', 'singers', 'songs')
+            .prefetch_related('lead_singers', 'singers', 'choir', 'songs')
             .get(pk=pk)
         )
 
@@ -254,6 +262,10 @@ class PlanViewSet(viewsets.ModelViewSet):
         # --- Վոկալ (singers) ---
         vocal_text = comma_join(full_names(plan.singers.all()))
         add_label_value('Վոկալ', vocal_text)
+
+        # --- Երգչախումբ (choir) ---
+        choir_text = comma_join(full_names(plan.choir.all()))
+        add_label_value('Երգչախումբ', choir_text)
 
         # --- spacer then a horizontal line before "Երգեր" ---
         doc.add_paragraph("")  # blank line (not bold, 16 via Normal)
