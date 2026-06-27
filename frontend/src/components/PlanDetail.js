@@ -209,7 +209,7 @@ const PlanDetail = () => {
                 <h2 className="section-title">Վոկալ</h2>
               </div>
               {singers.length === 0 ? (
-                <div className="empty"><div className="empty-illustration">🎤</div>Չկան երգիչներ</div>
+                <div className="empty"><div className="empty-illustration">🎤</div>Չկան...</div>
               ) : (
                 <ul className="people-grid">
                   {singers.map((s) => (
@@ -228,7 +228,7 @@ const PlanDetail = () => {
                 <h2 className="section-title">Երգչախումբ</h2>
               </div>
               {choir.length === 0 ? (
-                <div className="empty"><div className="empty-illustration">🎶</div>Չկան երգչախմբի անդամներ</div>
+                <div className="empty"><div className="empty-illustration">🎶</div>Չկան...</div>
               ) : (
                 <ul className="people-grid">
                   {choir.map((s) => (
@@ -247,7 +247,7 @@ const PlanDetail = () => {
                 <h2 className="section-title">Երաժիշտներ</h2>
               </div>
               {musicians.length === 0 ? (
-                <div className="empty"><div className="empty-illustration">🎸</div>Չկան երաժիշտներ</div>
+                <div className="empty"><div className="empty-illustration">🎸</div>Չկան...</div>
               ) : (
                 <ul className="people-grid">
                   {musicians.map((m) => (

@@ -1,23 +1,38 @@
 body {
-  background-color: #E6E6FA; /* Very light purple background for the entire page */
+  background:
+    radial-gradient(circle at 18% 8%, rgba(192, 38, 211, 0.16), transparent 28%),
+    radial-gradient(circle at 82% 18%, rgba(155, 140, 242, 0.14), transparent 30%),
+    #fcfaff;
   margin: 0;
   padding: 0;
   font-family: 'Arial, sans-serif';
 }
 
 .create-plan {
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 720px;
+  margin: 32px auto 48px;
   padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: color-mix(in oklab, var(--ew-card, #fffdf8) 90%, transparent);
+  border-radius: 18px;
+  box-shadow: var(--ew-shadow-soft, 0 14px 40px rgba(47, 37, 64, 0.07));
+  border: 1px solid rgba(47, 37, 64, 0.07);
+  position: relative;
+  overflow: hidden;
+}
+
+.create-plan::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5px;
+  background: linear-gradient(90deg, #ded6ff, #b9a7f7, #b4a4f5);
 }
 
 .create-plan h1 {
   text-align: center;
   margin-bottom: 20px;
-  color: #333;
+  color: var(--ew-teal-dark, #d9d5e6);
+  font-family: 'Noto Serif Armenian', Georgia, serif;
 }
 
 .create-plan .form-group {
@@ -28,16 +43,24 @@ body {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
-  color: #555;
+  color: var(--ew-ink, #172033);
 }
 
 .create-plan .form-group input,
 .create-plan .form-group select {
   width: calc(100% - 22px);
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  border: 1.6px solid rgba(155, 140, 242, 0.24);
+  border-radius: 10px;
   font-size: 16px;
+  background: #fffdf8;
+}
+
+.create-plan .form-group input:focus,
+.create-plan .form-group select:focus {
+  outline: none;
+  border-color: var(--ew-teal, #9b8cf2);
+  box-shadow: 0 0 0 4px rgba(155, 140, 242, 0.14);
 }
 
 .create-plan .form-group .song-group {
@@ -52,7 +75,7 @@ body {
 
 .create-plan .form-group .song-group button {
   padding: 10px;
-  background-color: #ff6666;
+  background-color: var(--ew-coral, #b4a4f5);
   color: white;
   border: none;
   border-radius: 5px;
@@ -60,13 +83,11 @@ body {
   font-size: 16px;
 }
 
-.create-plan .form-group .song-group button:hover {
-  background-color: #ff3333;
-}
+.create-plan .form-group .song-group button:hover { filter: brightness(1.05); }
 
 .create-plan .form-group button[type="button"] {
   padding: 10px 15px;
-  background-color: #66b3ff;
+  background-color: var(--ew-teal, #9b8cf2);
   color: white;
   border: none;
   border-radius: 5px;
@@ -74,14 +95,12 @@ body {
   font-size: 16px;
 }
 
-.create-plan .form-group button[type="button"]:hover {
-  background-color: #3399ff;
-}
+.create-plan .form-group button[type="button"]:hover { filter: brightness(1.05); }
 
 .create-plan button[type="submit"] {
   width: 100%;
   padding: 15px;
-  background-color: #4CAF50;
+  background: linear-gradient(135deg, #9b8cf2, #6f5a9a);
   color: white;
   border: none;
   border-radius: 5px;
@@ -90,15 +109,13 @@ body {
   margin-top: 10px;
 }
 
-.create-plan button[type="submit"]:hover {
-  background-color: #45a049;
-}
+.create-plan button[type="submit"]:hover { filter: brightness(1.04); }
 
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #003366;
+    background: linear-gradient(135deg, #5f4b7a, #b4a4f5 62%, #b9a7f7);
     padding: 10px 20px;
     border-radius: 10px;
     margin-bottom: 20
@@ -142,7 +159,7 @@ body {
 }
 
 .nav-link:hover {
-  background-color: #00509E;
+  background-color: rgba(255, 255, 255, 0.17);
   text-decoration: none;
 }
 
@@ -154,7 +171,7 @@ body {
     display: none;
     flex-direction: column;
     gap: 10px;
-    background-color: #003366;
+    background-color: var(--ew-teal-dark, #6d5a8d);
     position: absolute;
     top: 60px;
     left: 0;
