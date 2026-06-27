@@ -18,7 +18,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
 
     # SPA catch-all for other frontend routes
-    re_path(r"^(?!admin/).*", TemplateView.as_view(template_name="index.html")),
+    re_path(r"^(?!admin(?:/|$)).*", TemplateView.as_view(template_name="index.html")),
 ]
 
 if settings.DEBUG:
