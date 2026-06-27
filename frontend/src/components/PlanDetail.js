@@ -3,10 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import './PlanDetail.css';
 import logo from './logo.png';
-
-const API_BASE = window.location.hostname === 'localhost'
-  ? 'http://localhost:8000'
-  : 'https://emmanuel-worship-backend.onrender.com';
+import { API_BASE_URL } from '../config/api';
 
 const monthNames = [
   'Հունվար','Փետրվար','Մարտ','Ապրիլ','Մայիս','Հունիս',
@@ -27,13 +24,13 @@ const PlanDetail = () => {
   const [errMsg, setErrMsg] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const planUrl = useMemo(() => `${API_BASE}/api/plans/${id}/`, [id]);
+  const planUrl = useMemo(() => `${API_BASE_URL}/api/plans/${id}/`, [id]);
   const downloadPptUrl = useMemo(
-    () => `${API_BASE}/api/plans/${id}/download-concatenated-powerpoint/`,
+    () => `${API_BASE_URL}/api/plans/${id}/download-concatenated-powerpoint/`,
     [id]
   );
   const downloadDocxUrl = useMemo(
-    () => `${API_BASE}/api/plans/${id}/download-summary-docx/`,
+    () => `${API_BASE_URL}/api/plans/${id}/download-summary-docx/`,
     [id]
   );
 

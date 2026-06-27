@@ -1,4 +1,8 @@
 .env
-.env.local
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
 .idea
 .DS_Store

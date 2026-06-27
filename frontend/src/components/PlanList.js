@@ -5,8 +5,9 @@ import axios from 'axios';
 import './PlanList.css';
 import logo from './logo.png';
 import Pagination from './Pagination';
+import { API_BASE_URL } from '../config/api';
 
-const PLANS_CHOICES_URL = 'https://emmanuel-worship-backend.onrender.com/api/plans/choices/';
+const PLANS_CHOICES_URL = `${API_BASE_URL}/api/plans/choices/`;
 
 const monthNames = [
   'Հունվար','Փետրվար','Մարտ','Ապրիլ','Մայիս','Հունիս',

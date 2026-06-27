@@ -3,10 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './CreatePlan.css';
 import logo from './logo.png';
-
-const API_BASE = window.location.hostname === 'localhost'
-  ? 'http://localhost:8000'
-  : 'https://emmanuel-worship-backend.onrender.com';
+import { API_BASE_URL } from '../config/api';
 
 const asList = (data) => data.results || data;
 
@@ -25,17 +22,17 @@ const CreatePlan = () => {
 
   useEffect(() => {
     // Fetch all musicians
-    axios.get(`${API_BASE}/api/musicians/`)
+    axios.get(`${API_BASE_URL}/api/musicians/`)
       .then(response => setAllMusicians(asList(response.data)))
       .catch(error => console.error('There was an error fetching the musicians!', error));
 
     // Fetch all singers
-    axios.get(`${API_BASE}/api/singers/`)
+    axios.get(`${API_BASE_URL}/api/singers/`)
       .then(response => setAllSingers(asList(response.data)))
       .catch(error => console.error('There was an error fetching the singers!', error));
 
     // Fetch all songs
-    axios.get(`${API_BASE}/api/songs/`)
+    axios.get(`${API_BASE_URL}/api/songs/`)
       .then(response => setAllSongs(asList(response.data)))
       .catch(error => console.error('There was an error fetching the songs!', error));
   }, []);
@@ -69,7 +66,7 @@ const CreatePlan = () => {
 
     console.log('Plan data to be sent:', planData);
 
-    axios.post(`${API_BASE}/api/plans/`, planData)
+    axios.post(`${API_BASE_URL}/api/plans/`, planData)
       .then(() => {
         navigate('/plans');
       })
