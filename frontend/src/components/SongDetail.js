@@ -4,7 +4,9 @@ import axios from 'axios';
 import './SongDetail.css';
 import logo from './logo.png';
 
-const API_BASE = 'https://emmanuel-worship-backend.onrender.com';
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:8000'
+  : 'https://emmanuel-worship-backend.onrender.com';
 
 const SongDetail = () => {
   const { id } = useParams();
@@ -65,6 +67,7 @@ const SongDetail = () => {
       </div>
       <pre style="font-size:18px;line-height:1.5;white-space:pre-wrap;margin:0;font-family:ui-monospace,Menlo,Consolas,'Noto Sans Armenian',monospace;">
 ${song.verse ?? ''}
+${song.structure ? `\n\nStructure:\n${song.structure}` : ''}
       </pre>`;
     const win = window.open('', '', 'width=900,height=700');
     if (!win) return;
@@ -145,6 +148,13 @@ ${song.verse ?? ''}
             {song.verse && (
               <section className="section card verse-card">
                 <pre className="song-verse">{song.verse}</pre>
+              </section>
+            )}
+
+            {song.structure && (
+              <section className="section card verse-card">
+                <h2 className="section-title">Կառուցվածք</h2>
+                <pre className="song-verse">{song.structure}</pre>
               </section>
             )}
 

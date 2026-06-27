@@ -4,10 +4,17 @@ import axios from 'axios';
 import './CreatePlan.css';
 import logo from './logo.png';
 
+const API_BASE = window.location.hostname === 'localhost'
+  ? 'http://localhost:8000'
+  : 'https://emmanuel-worship-backend.onrender.com';
+
+const asList = (data) => data.results || data;
+
 const CreatePlan = () => {
   const [date, setDate] = useState('');
   const [leadSingers, setLeadSingers] = useState([]);
   const [singers, setSingers] = useState([]);
+  const [choir, setChoir] = useState([]);
   const [musicians, setMusicians] = useState([]);
   const [allMusicians, setAllMusicians] = useState([]);
   const [allSingers, setAllSingers] = useState([]);
@@ -18,18 +25,18 @@ const CreatePlan = () => {
 
   useEffect(() => {
     // Fetch all musicians
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/musicians/')
-      .then(response => setAllMusicians(response.data))
+    axios.get(`${API_BASE}/api/musicians/`)
+      .then(response => setAllMusicians(asList(response.data)))
       .catch(error => console.error('There was an error fetching the musicians!', error));
 
     // Fetch all singers
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/singers/')
-      .then(response => setAllSingers(response.data))
+    axios.get(`${API_BASE}/api/singers/`)
+      .then(response => setAllSingers(asList(response.data)))
       .catch(error => console.error('There was an error fetching the singers!', error));
 
     // Fetch all songs
-    axios.get('https://emmanuel-worship-backend.onrender.com/api/songs/')
-      .then(response => setAllSongs(response.data))
+    axios.get(`${API_BASE}/api/songs/`)
+      .then(response => setAllSongs(asList(response.data)))
       .catch(error => console.error('There was an error fetching the songs!', error));
   }, []);
 
@@ -55,13 +62,14 @@ const CreatePlan = () => {
       date,
       lead_singers: leadSingers,
       singers: singers,
+      choir: choir,
       musicians: musicians,
       plansong_set: songs,
     };
 
     console.log('Plan data to be sent:', planData);
 
-    axios.post('https://emmanuel-worship-backend.onrender.com/api/plans/', planData)
+    axios.post(`${API_BASE}/api/plans/`, planData)
       .then(() => {
         navigate('/plans');
       })
@@ -131,6 +139,24 @@ const CreatePlan = () => {
             value={singers}
             onChange={(e) =>
               setSingers(Array.from(e.target.selectedOptions, option => option.value))
+            }
+          >
+            {allSingers.map(person => (
+              <option key={person.id} value={person.id}>
+                {person.first_name} {person.last_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="choir">Choir</label>
+          <select
+            id="choir"
+            multiple
+            value={choir}
+            onChange={(e) =>
+              setChoir(Array.from(e.target.selectedOptions, option => option.value))
             }
           >
             {allSingers.map(person => (

@@ -6,6 +6,7 @@ import PlanList from './components/PlanList';
 import PlanDetail from './components/PlanDetail';
 import SongSelection from './components/SongSelection';
 import CreateSlide from './components/CreateSlide';
+import CreatePlan from './components/CreatePlan';
 
 const App = () => (
   <Router>
@@ -15,6 +16,7 @@ const App = () => (
       <Route path="/songs/:id" element={<SongDetail />} />
       <Route path="/plans" element={<PlanList />} />
       <Route path="/plans/:id" element={<PlanDetail />} />
+      <Route path="/create-plan" element={<CreatePlan />} />
       <Route path="/songs/select" element={<SongSelection />} />
       <Route path="/create-slide" element={<CreateSlide />} />
     </Routes>

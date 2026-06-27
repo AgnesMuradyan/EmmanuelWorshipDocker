@@ -28,6 +28,7 @@ class Song(models.Model):
     original_key = models.CharField(max_length=200, blank=True, null=True)
     album = models.ForeignKey(Album, related_name='songs', on_delete=models.CASCADE)
     verse = models.TextField(blank=True, null=True)
+    structure = models.TextField(blank=True, null=True)
     chords = models.BinaryField(null=True, blank=True)
     powerpoint = models.BinaryField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -156,6 +157,7 @@ class Plan(models.Model):
         blank=True,
     )
     singers = models.ManyToManyField('Singer', related_name='plans', blank=True)
+    choir = models.ManyToManyField('Singer', related_name='choir_plans', blank=True)
     musicians = models.ManyToManyField('Musician', related_name='plans', blank=True)
     songs = models.ManyToManyField(Song, through='PlanSong', related_name='plans', blank=True)
 
@@ -219,14 +221,6 @@ class Plan(models.Model):
         output.seek(0)
         print("PowerPoint presentation created successfully")
         return output.read()
-
-    lead_singers = models.ManyToManyField(
-        'Singer',
-        through='PlanLeadSinger',
-        related_name='lead_plans',
-        blank=True
-    )
-
 
 class PlanSong(models.Model):
     plan = models.ForeignKey(Plan, on_delete=models.CASCADE)

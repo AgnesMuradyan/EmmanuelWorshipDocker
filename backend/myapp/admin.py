@@ -31,7 +31,7 @@ class SongAdmin(admin.ModelAdmin):
     search_fields = ['title', 'original_key', 'album__title']
     fieldsets = (
         (None, {
-            'fields': ('title', 'original_link', 'original_key', 'album', 'verse', 'chords_file', 'powerpoint_file')
+            'fields': ('title', 'original_link', 'original_key', 'album', 'verse', 'structure', 'chords_file', 'powerpoint_file')
         }),
         ('Dates', {
             'fields': ('created_at', 'updated_at'),
@@ -83,7 +83,7 @@ class PlanAdmin(admin.ModelAdmin):
 
     def formfield_for_manytomany(self, db_field, request, **kwargs):
         from .models import Singer
-        if db_field.name in ('singers', 'lead_singers'):
+        if db_field.name in ('singers', 'lead_singers', 'choir'):
             kwargs['queryset'] = Singer.objects.order_by('first_name', 'last_name')
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
