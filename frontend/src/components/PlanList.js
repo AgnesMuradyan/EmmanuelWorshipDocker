@@ -1,5 +1,5 @@
 // src/components/PlanList.jsx
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './PlanList.css';
@@ -88,11 +88,6 @@ const PlanList = () => {
   };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
-
-  const headerChip = useMemo(
-    () => dayTypeLabel(selectedDayType),
-    [selectedDayType]
-  );
 
   return (
     <div className="page-bg">

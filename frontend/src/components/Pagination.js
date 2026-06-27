@@ -171,7 +171,7 @@ export default function Pagination({
         aria="Նախորդ էջ"
       />
 
-      <ul className="pg-list" role="list">
+      <ul className="pg-list">
         {items.map((it, idx) => {
           if (it.type === 'page') {
             return <li key={`p-${it.value}`}><NumBtn n={it.value} /></li>;

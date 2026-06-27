@@ -19,9 +19,9 @@ services:
     ports:
       - "3000:3000"
     command: >
-      sh -c "npm install &&
+      sh -c "npm ci --no-optional &&
              npm run build &&
-             npm start"
+             node static-server.js"
 
   backend:
     build:
@@ -29,7 +29,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/app
-      - frontend-build:/app/frontend/build  # Mount the frontend build directory
+      - ./frontend/build:/app/frontend/build  # Share the generated React build with Django
     depends_on:
       - db
       - frontend
@@ -45,4 +45,3 @@ services:
 
 volumes:
   postgres_data:
-  frontend-build:
