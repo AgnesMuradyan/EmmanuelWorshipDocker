@@ -3,10 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import './SongDetail.css';
 import logo from './logo.png';
-
-const API_BASE = window.location.hostname === 'localhost'
-  ? 'http://localhost:8000'
-  : 'https://emmanuel-worship-backend.onrender.com';
+import { API_BASE_URL } from '../config/api';
 
 const SongDetail = () => {
   const { id } = useParams();
@@ -15,9 +12,9 @@ const SongDetail = () => {
   const [errMsg, setErrMsg] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const chordsUrl = useMemo(() => `${API_BASE}/api/songs/${id}/view-chords/`, [id]);
-  const pptUrl = useMemo(() => `${API_BASE}/api/songs/${id}/view-powerpoint/`, [id]);
-  const detailUrl = useMemo(() => `${API_BASE}/api/songs/${id}/`, [id]);
+  const chordsUrl = useMemo(() => `${API_BASE_URL}/api/songs/${id}/view-chords/`, [id]);
+  const pptUrl = useMemo(() => `${API_BASE_URL}/api/songs/${id}/view-powerpoint/`, [id]);
+  const detailUrl = useMemo(() => `${API_BASE_URL}/api/songs/${id}/`, [id]);
 
   useEffect(() => {
     let mounted = true;

@@ -5,10 +5,10 @@ import axios from 'axios';
 import './SongList.css';
 import logo from './logo.png';
 import Pagination from './Pagination';
+import { API_BASE_URL } from '../config/api';
 
-const API_BASE = 'https://emmanuel-worship-backend.onrender.com'; // adjust if your backend differs
 const PAGE_SIZE = 15;
-const SONGS_CHOICES_URL = `${API_BASE}/api/songs/choices/`;
+const SONGS_CHOICES_URL = `${API_BASE_URL}/api/songs/choices/`;
 
 const SongList = () => {
   const [songs, setSongs] = useState([]);

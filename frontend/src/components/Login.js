@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -9,7 +10,7 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('https://emmanuel-worship-backend.onrender.com/api/login/', { username, password })
+    axios.post(`${API_BASE_URL}/api/login/`, { username, password })
       .then(response => {
         localStorage.setItem('token', response.data.token);
         history.push('/create-plan');
