@@ -4,16 +4,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Noto+Serif+Armenian:wght@600;700&display=swap');
 
 :root{
-  --c-bg: #f6f8ff;
-  --c-text: #223046;
-  --c-muted: #5b6b83;
-  --c-card: #ffffff;
+  --c-bg: var(--ew-bg, #fbfaf6);
+  --c-text: var(--ew-ink, #172033);
+  --c-muted: var(--ew-muted, #667085);
+  --c-card: var(--ew-card, #fffdf8);
 
-  --c-grad-1: #d7e6ff;
-  --c-grad-2: #f5e9ff;
+  --c-grad-1: #e9d5ff;
+  --c-grad-2: #f1edff;
 
-  --c-primary-1: #00509E;
-  --c-primary-2: #003366;
+  --c-primary-1: var(--ew-coral, #b4a4f5);
+  --c-primary-2: var(--ew-teal, #9b8cf2);
 
   --shadow-1: 0 6px 20px rgba(0,0,0,.08);
   --shadow-2: 0 12px 36px rgba(0,0,0,.12);
@@ -29,8 +29,8 @@
     --c-grad-1: #16243d;
     --c-grad-2: #221b38;
 
-    --c-primary-1: #6aa8ff;
-    --c-primary-2: #98bfff;
+    --c-primary-1: #b4a4f5;
+    --c-primary-2: #9b8cf2;
     --shadow-1: 0 10px 28px rgba(0,0,0,.45);
     --shadow-2: 0 18px 48px rgba(0,0,0,.55);
   }
@@ -69,12 +69,17 @@ html, body {
   padding: 20px;
 }
 .glass{
-  background: color-mix(in oklab, var(--c-card) 72%, transparent);
+  background: color-mix(in oklab, var(--c-card) 86%, transparent);
   border-radius: 18px;
   backdrop-filter: saturate(140%) blur(10px);
   box-shadow: var(--shadow-1);
-  border: 1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
+  border: 1px solid rgba(47, 37, 64, 0.07);
   animation: fadeIn .45s ease both;
+  position: relative;
+}
+.glass::before{
+  content:""; position:absolute; inset:0 0 auto; height:5px; border-radius:18px 18px 0 0;
+  background: linear-gradient(90deg, #ded6ff, #b9a7f7, #b4a4f5);
 }
 
 /* =========================
@@ -84,7 +89,7 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, var(--c-primary-2), var(--c-primary-1));
+  background: linear-gradient(135deg, #5f4b7a, #b4a4f5 62%, #b9a7f7);
   padding: 12px 16px;
   border-radius: 14px;
   margin-bottom: 22px;
@@ -118,8 +123,9 @@ html, body {
   font-family: 'Noto Serif Armenian', serif;
   font-size: clamp(1.8rem, 1.4rem + 2vw, 2.6rem);
   text-align: center; margin: 8px 0 10px;
-  color: var(--c-primary-2);
+  color: #6d5a8d;
   font-weight: 800; letter-spacing: .5px;
+  text-shadow: 0 1px 0 rgba(255,255,255,.72);
 }
 .header-stack{ display: grid; gap: 10px; }
 .chip-row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
@@ -133,10 +139,10 @@ html, body {
 }
 .chip-muted{ color: var(--c-muted); }
 
-.chip-type-all{ color:#fff; background: linear-gradient(135deg, var(--c-primary-1), var(--c-primary-2)); border:none; }
-.chip-type-su{ background:#e9f2ff; color:#0a4fb3; }
-.chip-type-th{ background:#f3e9ff; color:#6d2db8; }
-.chip-type-ot{ background:#eafaf0; color:#1b7a48; }
+.chip-type-all{ color:#fff; background: linear-gradient(135deg, #9b8cf2, #6f5a9a); border:none; }
+.chip-type-su{ background:var(--ew-sky, #f1edff); color:#6f5a9a; }
+.chip-type-th{ background:var(--ew-rose, #faf7ff); color:#7c6496; }
+.chip-type-ot{ background:var(--ew-mint, #f6f1ff); color:#6d5a8d; }
 
 /* =========================
    CONTROLS (sticky)
@@ -145,7 +151,7 @@ html, body {
 .sticky-controls{ padding: 10px 12px; backdrop-filter: blur(6px); }
 .control-grid{
   display:grid; grid-template-columns: minmax(220px, 1fr) auto; align-items:center; gap:14px;
-  background: color-mix(in oklab, var(--c-card) 75%, transparent);
+  background: color-mix(in oklab, var(--c-card) 88%, transparent);
   padding: 10px; border-radius: 14px; box-shadow: var(--shadow-1);
   border: 1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
 }
@@ -153,7 +159,7 @@ html, body {
 /* Search */
 .input-wrap{ width:100%; }
 .search-input{
-  width: 100%; padding: 12px 14px; border:1.6px solid #d1d9e6;
+  width: 100%; padding: 12px 14px; border:1.6px solid rgba(155, 140, 242, 0.24);
   border-radius: 12px; font-size: 1rem; background: var(--c-card); transition: .2s;
 }
 .search-input:focus{
@@ -167,7 +173,7 @@ html, body {
 }
 .filters label{
   position:relative; display:inline-flex; align-items:center; cursor:pointer;
-  border: 1.5px solid #d1d9e6; border-radius: 999px; background: var(--c-card);
+  border: 1.5px solid rgba(23, 32, 51, 0.12); border-radius: 999px; background: var(--c-card);
   transition: transform .2s ease, box-shadow .2s ease;
   box-shadow: 0 2px 6px rgba(0,0,0,.04);
   user-select:none;
@@ -178,7 +184,7 @@ html, body {
   padding: 8px 16px; font-size:.95rem; font-weight:600; color: var(--c-primary-2); border-radius:999px;
 }
 .filters input:checked + span{
-  background: linear-gradient(135deg, var(--c-primary-1), var(--c-primary-2));
+  background: linear-gradient(135deg, #b9a7f7, #b4a4f5);
   color:#fff; border: 1.5px solid var(--c-primary-1); box-shadow: 0 10px 18px rgba(0,80,158,.28);
 }
 
@@ -190,21 +196,21 @@ html, body {
 
 .plan-card{
   display:grid; grid-template-columns: 84px 1fr; gap: 14px; align-items:center;
-  text-decoration:none; background: color-mix(in oklab, var(--c-card) 85%, transparent);
-  border: 1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
+  text-decoration:none; background: color-mix(in oklab, var(--c-card) 92%, transparent);
+  border: 1px solid rgba(47, 37, 64, 0.07);
   padding: 14px; border-radius: 16px; box-shadow: var(--shadow-1);
   transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
   color: inherit;
 }
 .plan-card:hover, .plan-card:focus-visible{
-  transform: translateY(-2px);
+  transform: translateY(-3px) rotate(0.25deg);
   box-shadow: var(--shadow-2);
   outline:none;
 }
 
 .date-badge{
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  background: linear-gradient(180deg, var(--c-primary-1), var(--c-primary-2));
+  background: linear-gradient(160deg, #9b8cf2, #6d5a8d);
   color:#fff; border-radius: 14px; padding: 10px 8px; min-height: 78px;
   box-shadow: inset 0 -3px 10px rgba(0,0,0,.15);
 }
@@ -212,16 +218,16 @@ html, body {
 .date-badge .mon{ font-size: .9rem; opacity: .9; letter-spacing: .5px; text-transform: uppercase; }
 
 .plan-main{ display:grid; gap: 6px; }
-.plan-title{ font-weight: 700; font-size: 1.06rem; letter-spacing:.2px; }
+.plan-title{ font-weight: 700; font-size: 1.06rem; letter-spacing:.2px; color:#fff; }
 .meta-row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
 .meta-chip{
   padding: 6px 10px; border-radius:999px; font-size:.85rem; font-weight:700; letter-spacing:.2px;
   background:#eef3ff; color:#1a4fb3;
 }
-.type-su{ background:#e7f0ff; color:#0a4fb3; }
-.type-th{ background:#efe7ff; color:#6d2db8; }
-.type-ot{ background:#e7fbf0; color:#136c3e; }
-.type-all{ background:#e8ecff; color:#2b3fa1; }
+.type-su{ background:var(--ew-sky, #f1edff); color:#6f5a9a; }
+.type-th{ background:var(--ew-rose, #faf7ff); color:#7c6496; }
+.type-ot{ background:var(--ew-mint, #f6f1ff); color:#6d5a8d; }
+.type-all{ background:#e9d5ff; color:#695278; }
 .meta-link{ font-size:.9rem; color: var(--c-primary-1); opacity:.9; }
 .plan-card:active{ transform: translateY(0); }
 
@@ -253,6 +259,8 @@ html, body {
 .empty{
   text-align:center; padding:40px 16px; background: color-mix(in oklab, var(--c-card) 80%, transparent);
   border-radius:16px; border:1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
+  color:#4f3c6c;
+  font-weight:600;
 }
 .empty-illustration{ font-size: 3rem; margin-bottom: 8px; }
 .error-card{

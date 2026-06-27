@@ -110,7 +110,6 @@ export default function CreateSlide() {
                   onChange={(e) => setText(e.target.value)}
                 />
                 <div className="chip-row" style={{ marginTop: 8, justifyContent: 'space-between' }}>
-                  <span className="chip chip-muted">Unicode նորմալացում (NFC)՝ սերվերի վրա</span>
                   <span className="chip chip-muted">{text.length} / {MAX_TEXT_LEN}</span>
                 </div>
               </div>

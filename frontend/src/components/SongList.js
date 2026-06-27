@@ -192,7 +192,7 @@ const SongList = () => {
                           <div className="meta-row">
                             {song.original_key && <span className="meta-chip key-chip">Սր՝ {song.original_key}</span>}
                             {song.album_title && <span className="meta-chip album-chip">{song.album_title}</span>}
-                            <span className="meta-link">Դիտել երգը →</span>
+                            <span className="meta-link">Բացել երգը →</span>
                           </div>
                         </div>
                       </Link>

@@ -11,3 +11,32 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+:root {
+  --ew-bg: #fcfaff;
+  --ew-ink: #2f2540;
+  --ew-muted: #7c718f;
+  --ew-card: #fffefe;
+  --ew-teal: #9b8cf2;
+  --ew-teal-dark: #6d5a8d;
+  --ew-coral: #b4a4f5;
+  --ew-gold: #b9a7f7;
+  --ew-mint: #f6f1ff;
+  --ew-rose: #faf7ff;
+  --ew-sky: #f1edff;
+  --ew-line: rgba(23, 32, 51, 0.12);
+  --ew-shadow-soft: 0 14px 40px rgba(47, 37, 64, 0.07);
+  --ew-shadow-lift: 0 20px 54px rgba(47, 37, 64, 0.11);
+}
+
+html {
+  background:
+    radial-gradient(circle at 14% 8%, rgba(192, 38, 211, 0.18), transparent 28%),
+    radial-gradient(circle at 86% 16%, rgba(155, 140, 242, 0.18), transparent 30%),
+    linear-gradient(180deg, #fdfaff 0%, var(--ew-bg) 48%, #faf7ff 100%);
+}
+
+body {
+  background: transparent;
+  color: var(--ew-ink);
+}

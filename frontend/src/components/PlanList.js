@@ -237,7 +237,7 @@ const PlanList = () => {
                             <span className={`meta-chip type-${type || 'all'}`}>
                               {dayTypeLabel(plan.day_type || 'ALL')}
                             </span>
-                            <span className="meta-link">Դիտել պլանը →</span>
+                            <span className="meta-link">Բացել ծրագիրը →</span>
                           </div>
                         </div>
                       </Link>
