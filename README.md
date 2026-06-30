@@ -20,9 +20,7 @@ Create the backend environment and install development dependencies:
 
 ```bash
 cd backend
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements-dev.txt
+uv sync
 ```
 
 Install frontend dependencies:
