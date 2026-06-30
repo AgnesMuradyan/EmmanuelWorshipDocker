@@ -1,53 +1,29 @@
-from django.http import HttpResponse
-from rest_framework import viewsets, status
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from .models import Album, Song, Instrument, Musician, MusicianInstrument, Singer, Plan, PlanSong
-from .serializers import (
-    AlbumSerializer,
-    SongSerializer,
-    InstrumentSerializer,
-    MusicianSerializer,
-    MusicianInstrumentSerializer,
-    SingerSerializer,
-    PlanSerializer, PlanSongSerializer
-)
-from django.http import HttpResponse
-from django.views.decorators.http import require_GET
-from unicodedata import normalize
-from django.shortcuts import render, get_object_or_404
-from rest_framework.views import APIView
-from rest_framework import viewsets
-from rest_framework.filters import SearchFilter, OrderingFilter
-from .models import Song
-from .serializers import SongSerializer
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from .serializers import SongSerializer, SongChoiceSerializer
 from io import BytesIO
-from django.http import HttpResponse
-from docx import Document
-from io import BytesIO
-from django.http import HttpResponse
-from rest_framework.decorators import action
-from docx import Document
-from docx.shared import Pt
-from docx.oxml import OxmlElement
-from docx.oxml.ns import qn
-# views.py
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from unicodedata import normalize
 
-# pptx bits (already used elsewhere in your project)
-from pptx import Presentation
-from pptx.util import Inches, Pt
-from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
-# views.py
-from django.http import JsonResponse
-from django.views.decorators.csrf import ensure_csrf_cookie
-ALLOWED_ORIGIN = "*"  # or set to "http://localhost:3000" for stricter dev
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.views.decorators.http import require_GET
+from docx import Document
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
+from docx.shared import Pt
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.response import Response
+
+from .models import Album, Instrument, Musician, MusicianInstrument, Plan, PlanSong, Singer, Song
+from .serializers import (
+    AlbumSerializer,
+    InstrumentSerializer,
+    MusicianInstrumentSerializer,
+    MusicianSerializer,
+    PlanSerializer,
+    PlanSongSerializer,
+    SingerSerializer,
+    SongSerializer,
+)
 
 
 def index(request):
@@ -70,7 +46,7 @@ class SongViewSet(viewsets.ModelViewSet):
     def choices(self, request):
         qs = self.filter_queryset(self.get_queryset()) \
                  .order_by("title") \
-                 .values("id", "title")  # ✅ returns dicts straight from DB
+                 .values("id", "title")
 
         page = self.paginate_queryset(qs)
         if page is not None:
@@ -105,7 +81,6 @@ class PlanViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         qs = super().get_queryset()
-        # existing filters:
         date_val = self.request.query_params.get("date")
         if date_val:
             qs = qs.filter(date=date_val)
@@ -182,7 +157,6 @@ class PlanViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['get'], url_path='download-summary-docx', url_name='download_summary_docx')
     def download_summary_docx(self, request, pk=None):
-        # Prefetch to avoid N+1 queries
         plan = (
             self.get_queryset()
             .prefetch_related('lead_singers', 'singers', 'choir', 'songs')
@@ -191,7 +165,6 @@ class PlanViewSet(viewsets.ModelViewSet):
 
         doc = Document()
 
-        # Set global font to Calibri 16
         normal = doc.styles['Normal']
         normal.font.name = 'Calibri'
         normal.font.size = Pt(16)
@@ -239,42 +212,34 @@ class PlanViewSet(viewsets.ModelViewSet):
             pBdr = OxmlElement('w:pBdr')
             bottom = OxmlElement('w:bottom')
             bottom.set(qn('w:val'), 'single')
-            bottom.set(qn('w:sz'), '12')  # thickness (1/8 pt units)
+            bottom.set(qn('w:sz'), '12')
             bottom.set(qn('w:space'), '1')
             bottom.set(qn('w:color'), 'auto')
             pBdr.append(bottom)
             pPr.append(pBdr)
             return p
 
-        # --- Date line (bold, 16) ---
         try:
-            # Armenian-style punctuation for date: dd.MM․yy
             date_str = plan.date.strftime('%d.%m․%y')
         except Exception:
             date_str = str(plan.date)
         add_bold_line(date_str)
 
-        # --- Վարողներ (lead singers) ---
         lead_qs = plan.planleadsinger_set.select_related('singer').order_by('order')
         lead_names = [f"{pls.singer.first_name} {pls.singer.last_name}".strip() for pls in lead_qs]
         add_label_value('Վարողներ', ', '.join(lead_names) if lead_names else '—')
 
-        # --- Վոկալ (singers) ---
         vocal_text = comma_join(full_names(plan.singers.all()))
         add_label_value('Վոկալ', vocal_text)
 
-        # --- Երգչախումբ (choir) ---
         choir_text = comma_join(full_names(plan.choir.all()))
         add_label_value('Երգչախումբ', choir_text)
 
-        # --- spacer then a horizontal line before "Երգեր" ---
-        doc.add_paragraph("")  # blank line (not bold, 16 via Normal)
+        doc.add_paragraph("")
         add_horizontal_rule()
 
-        # --- "Երգեր՝" title (bold, 16) ---
         add_bold_line("Երգեր՝")
 
-        # Preserve custom ordering if available
         try:
             songs_qs = plan.songs.all().order_by('plansong__order', 'id')
         except Exception:
@@ -287,8 +252,7 @@ class PlanViewSet(viewsets.ModelViewSet):
 
         if titles:
             for t in titles:
-                p = doc.add_paragraph(t, style='List Number')  # numbered list items
-                # Ensure numbering items are Calibri 16 (inherits from Normal, but set explicitly for safety)
+                p = doc.add_paragraph(t, style='List Number')
                 for r in p.runs:
                     r.bold = False
                     r.font.name = 'Calibri'
@@ -300,7 +264,6 @@ class PlanViewSet(viewsets.ModelViewSet):
                 r.font.name = 'Calibri'
                 r.font.size = Pt(16)
 
-        # Serialize to bytes
         buf = BytesIO()
         doc.save(buf)
         buf.seek(0)
@@ -339,45 +302,11 @@ class PlanSongViewSet(viewsets.ModelViewSet):
     serializer_class = PlanSongSerializer
 
 
-# class PlanViewSet(viewsets.ModelViewSet):
-#     queryset = Plan.objects.all()
-#     serializer_class = PlanSerializer
-#
-# class PlanList(APIView):
-#     def get(self, request):
-#         plans = Plan.objects.all()
-#         serializer = PlanSerializer(plans, many=True)
-#         return Response(serializer.data)
-#
-# class PlanDetail(APIView):
-#     def get(self, request, pk):
-#         plan = get_object_or_404(Plan, pk=pk)
-#         serializer = PlanSerializer(plan)
-#         return Response(serializer.data)
-
-
-
-# class SongList(APIView):
-#     def get(self, request):
-#         songs = Song.objects.all()
-#         serializer = SongSerializer(songs, many=True)
-#         return Response(serializer.data)
-#
-#
-# class SongDetail(APIView):
-#     def get(self, request, pk):
-#         song = get_object_or_404(Song, pk=pk)
-#         serializer = SongSerializer(song)
-#         return Response(serializer.data)
-
-
-
 @require_GET
 def create_slide_dl(request):
     try:
         text = request.GET.get("text", "")
 
-        # build using legacy Arial*; then force Agg-Book1 at the end
         build_font = request.GET.get("font", "Arial Armenian")
         final_font = request.GET.get("final_font", "Agg_Book1")
 
@@ -391,7 +320,6 @@ def create_slide_dl(request):
         except Exception as e:
             return HttpResponse(f"python-pptx not available: {e}", status=500, content_type="text/plain; charset=utf-8")
 
-        # ---------- Unicode -> ArmSCII-8 bytes -> Latin-1 (with «→§, »→¦) ----------
         def unicode_to_armscii8_latin1(s: str) -> str:
             s = normalize("NFC", s)
             if not hasattr(unicode_to_armscii8_latin1, "_map"):
@@ -417,17 +345,16 @@ def create_slide_dl(request):
                 cp = ord(ch)
                 if cp in mp:
                     out.append(mp[cp])
-                elif cp == 0x00AB:      # «
-                    out.append(0xA7)     # §
-                elif cp == 0x00BB:      # »
-                    out.append(0xA6)     # ¦
+                elif cp == 0x00AB:
+                    out.append(0xA7)
+                elif cp == 0x00BB:
+                    out.append(0xA6)
                 elif cp <= 0xFF:
                     out.append(cp)
                 else:
                     out.append(ord('?'))
             return out.decode("latin-1")
 
-        # ---------- helpers ----------
         def _set_rfonts(el, name: str):
             rFonts = el.find(qn('a:rFonts'))
             if rFonts is None:
@@ -458,7 +385,6 @@ def create_slide_dl(request):
             except Exception:
                 pass
 
-        # ---------- stanza-aware splitting (restart pairing at blank lines) ----------
         raw_lines_all = text.replace("\r\n", "\n").split("\n")
         stanzas, cur = [], []
         for raw in raw_lines_all:
@@ -470,7 +396,6 @@ def create_slide_dl(request):
         if cur:
             stanzas.append(cur)
 
-        # chunk each stanza into 2-line slides; leftover 1 line gets its own slide
         chunks = []
         for stanza in stanzas:
             for i in range(0, len(stanza), 2):
@@ -482,14 +407,11 @@ def create_slide_dl(request):
         prs.slide_width = Inches(23.00)
         prs.slide_height = Inches(12.00)
 
-        # empty first slide
         s0 = prs.slides.add_slide(prs.slide_layouts[5])
         bg = s0.background.fill; bg.solid(); bg.fore_color.rgb = RGBColor(0,0,0)
 
-        # build with the chosen legacy font
         _override_theme_fonts(prs, build_font)
 
-        # content slides
         for chunk in chunks:
             slide = prs.slides.add_slide(prs.slide_layouts[5])
             fill = slide.background.fill; fill.solid(); fill.fore_color.rgb = RGBColor(0,0,0)
@@ -518,11 +440,9 @@ def create_slide_dl(request):
             if len(chunk) > 1:
                 add_line(chunk[1])
 
-        # empty last slide
         slast = prs.slides.add_slide(prs.slide_layouts[5])
         bg2 = slast.background.fill; bg2.solid(); bg2.fore_color.rgb = RGBColor(0,0,0)
 
-        # ---------- final pass: force EVERYTHING to Agg-Book1 ----------
         _override_theme_fonts(prs, final_font)
         for slide in prs.slides:
             for shape in slide.shapes:
@@ -554,7 +474,6 @@ def create_slide_dl(request):
                                     run.font.color.rgb = RGBColor(255,255,255)
                                     _set_rfonts(run._r.get_or_add_rPr(), final_font)
 
-        # return file
         from io import BytesIO
         from time import strftime
         buf = BytesIO(); prs.save(buf); buf.seek(0)

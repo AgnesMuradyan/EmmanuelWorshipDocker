@@ -1,9 +1,10 @@
-# myapp/views_share.py
 import re
+
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.utils.html import escape
+
 from .models import Song
 
 BOT_UA = ("facebookexternalhit","twitterbot","slackbot",
@@ -11,11 +12,8 @@ BOT_UA = ("facebookexternalhit","twitterbot","slackbot",
 
 def _desc_from_verse(verse: str | None, limit: int = 200) -> str:
     raw = verse or ""
-    # collapse whitespace/newlines/tabs
     flat = re.sub(r"\s+", " ", raw).strip()
-    # hard limit (OG recommend ~200 chars)
     flat = flat[:limit]
-    # escape &, <, >, " so meta content stays valid
     return escape(flat)
 
 def song_share(request, pk: int):

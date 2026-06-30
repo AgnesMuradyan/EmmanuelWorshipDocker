@@ -1,4 +1,3 @@
-# 0004_add_temp_lead_field.py
 from django.db import migrations, models
 
 class Migration(migrations.Migration):
@@ -13,7 +12,7 @@ class Migration(migrations.Migration):
             field=models.ManyToManyField(
                 to='myapp.Singer',
                 through='myapp.PlanLeadSinger',
-                related_name='+',  # no reverse name; temporary
+                related_name='+',
                 blank=True,
             ),
         ),

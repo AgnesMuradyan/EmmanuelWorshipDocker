@@ -1,9 +1,9 @@
-# admin.py
-from django.contrib import admin
 from django import forms
-from django.db import transaction, connections  # <-- add this
+from django.contrib import admin
+from django.db import transaction, connections
+
 from .models import Album, Song, Instrument, Musician, MusicianInstrument, Singer, Plan, PlanSong, PlanLeadSinger
-from .serializers import SongSerializer
+
 
 class SongAdminForm(forms.ModelForm):
     chords_file = forms.FileField(required=False, help_text="Upload a PDF file for the chords.")
@@ -25,6 +25,7 @@ class SongAdminForm(forms.ModelForm):
             instance.save()
         return instance
 
+
 class SongAdmin(admin.ModelAdmin):
     form = SongAdminForm
     list_display = ['title', 'original_key', 'album', 'created_at', 'updated_at']
@@ -39,6 +40,7 @@ class SongAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('created_at', 'updated_at')
 
+
 class PlanSongForm(forms.ModelForm):
     class Meta:
         model = PlanSong
@@ -49,24 +51,26 @@ class PlanSongForm(forms.ModelForm):
         Skip Django's model-level unique validation so we don't block swaps like 1↔2.
         DB (deferrable) constraint will still enforce uniqueness at commit.
         """
-        # Intentionally do NOT call super().validate_unique()
         return
+
 
 class PlanSongInline(admin.TabularInline):
     model = PlanSong
-    form = PlanSongForm            # <— use the custom form
+    form = PlanSongForm
     extra = 0
     fields = ('song', 'order')
     raw_id_fields = ('song',)
     ordering = ('order',)
 
+
 class PlanLeadSingerForm(forms.ModelForm):
     class Meta:
         model = PlanLeadSinger
         fields = '__all__'
+
     def validate_unique(self):
-        # allow swapping like 1↔2; DB constraint enforces at COMMIT
         return
+
 
 class PlanLeadSingerInline(admin.TabularInline):
     model = PlanLeadSinger
@@ -75,6 +79,7 @@ class PlanLeadSingerInline(admin.TabularInline):
     fields = ('singer', 'order')
     raw_id_fields = ('singer',)
     ordering = ('order',)
+
 
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
@@ -88,11 +93,11 @@ class PlanAdmin(admin.ModelAdmin):
         return super().formfield_for_manytomany(db_field, request, **kwargs)
 
     def save_related(self, request, form, formsets, change):
-        from django.db import transaction, connections
         with transaction.atomic():
             with connections['default'].cursor() as cursor:
                 cursor.execute('SET CONSTRAINTS ALL DEFERRED')
             super().save_related(request, form, formsets, change)
+
 
 admin.site.register(Song, SongAdmin)
 admin.site.register(Album)

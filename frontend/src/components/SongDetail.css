@@ -1,4 +1,4 @@
-/* keep your existing body/background; this file won’t touch it */
+
 
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Serif+Armenian:wght@600;700&display=swap');
 
@@ -18,10 +18,10 @@
 
 * { box-sizing: border-box; }
 
-/* Shell just provides spacing; no background color here */
+
 .song-detail-shell { padding: 20px 0 40px; }
 
-/* Glass container */
+
 .song-detail-container{
   max-width: 980px; margin: 0 auto; padding: 20px;
   background: color-mix(in oklab, var(--c-card) 88%, transparent);
@@ -38,7 +38,7 @@
   background: linear-gradient(90deg, #ded6ff, #b9a7f7, #b4a4f5);
 }
 
-/* Navbar (sticky look without changing page bg) */
+
 .navbar{
   display:flex; justify-content:space-between; align-items:center;
   background: linear-gradient(135deg, #5f4b7a, #b4a4f5 62%, #b9a7f7);
@@ -53,7 +53,7 @@
 .nav-link{ color:#fff; text-decoration:none; font-weight:700; padding:8px 12px; border-radius:10px; transition:.25s; }
 .nav-link:hover, .nav-link:focus-visible{ background-color: rgba(255,255,255,.17); outline:none; }
 
-/* Header */
+
 .header-stack{ display:grid; gap:10px; align-items:center; }
 .song-title{
   font-family:'Noto Serif Armenian', serif;
@@ -71,7 +71,7 @@
 }
 .album-chip{ background:var(--ew-rose, #faf7ff); color: #7c6496; border-color:var(--c-border); }
 
-/* Sections & cards */
+
 .section{ margin-top: 16px; }
 .card{
   background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(250,247,255,.9));
@@ -81,16 +81,16 @@
 .section-title{ margin:0 0 10px; font-size:1.05rem; font-weight:800; color: #6d5a8d; }
 .section-title-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
 
-/* Bigger "Նոտաներ" title */
+
 .section-title-big {
   font-size: 1.25rem;
-  text-align: center;   /* ⬅️ center the title */
+  text-align: center;
   display: block;
-  width: 100%;          /* so the centering spans full row */
+  width: 100%;
   margin-bottom: 10px;
 }
 
-/* Verse */
+
 .verse-card .song-verse{
   white-space: pre-wrap;
   font-size: 1rem; line-height:1.6;
@@ -100,12 +100,12 @@
   box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
 }
 
-/* Original link */
+
 .meta-card .link-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .external-link{ font-weight:800; color: #4f3c6c; text-decoration:none; }
 .external-link:hover{ color:#4f3c6c; text-decoration: underline; }
 
-/* Chords viewer */
+
 .chords-card .chords-container{
   position: relative; height: 680px; overflow: hidden; max-width: 100%;
   background: var(--c-soft); border:1px solid var(--c-border); border-radius: 12px;
@@ -113,24 +113,24 @@
 }
 .chords-iframe{ position:absolute; inset:0; width:100%; height:100%; border:0; }
 
-/* Buttons under the "Նոտաներ" title */
+
 .chords-actions{
   display: flex;
-  flex-direction: row;      /* same line */
-  justify-content: center;  /* centered horizontally */
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;          /* wrap on small screens */
+  flex-wrap: wrap;
   margin: 12px 0 16px;
   width: 100%;
-  text-align: initial;      /* prevent inherited right align */
+  text-align: initial;
 }
 
 .chords-actions .btn{
-  display: inline-flex;     /* keep intrinsic size */
-  margin: 0;                /* no stray margins pushing right */
+  display: inline-flex;
+  margin: 0;
 }
-/* Actions */
+
 .actions-card{
   display:flex;
   flex-direction:column;
@@ -148,7 +148,7 @@
   justify-content:center;
 }
 
-/* Dates */
+
 .dates-card .dates-grid{ display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap:10px; }
 .date-item{
   display:grid; gap:4px; background:var(--c-soft); padding:10px; border-radius:12px; border:1px solid var(--c-border);
@@ -156,7 +156,7 @@
 .date-label{ font-size:.85rem; color: var(--c-muted); }
 .date-value{ font-weight:800; }
 
-/* Buttons */
+
 .btn{
   background: linear-gradient(135deg, #8d7ae6, #6d5a8d); color:#fff; border:1px solid rgba(255,255,255,.32);
   padding:11px 16px; border-radius:12px; cursor:pointer; font-weight:800; transition:.2s;
@@ -182,7 +182,7 @@
 }
 .btn-ghost:hover{ background:#fff; color:#4f3c6c; }
 
-/* Empty & Error */
+
 .empty{
   text-align:center; padding:24px; background:var(--c-soft); border-radius:12px; border:1px solid var(--c-border);
   color:#4f3c6c;
@@ -192,7 +192,7 @@
 .error-card{ display:flex; align-items:center; gap:14px; padding:16px; border-radius:14px; background:#fff1f0; border:1px solid #ffd6d6; color:#991b1b; margin-bottom:10px; }
 .err-icon{ font-size:1.6rem; }
 
-/* Skeleton */
+
 .skeleton-card{ position:relative; overflow:hidden; min-height:140px; }
 .skeleton-card::after{
   content:""; position:absolute; inset:0;
@@ -205,7 +205,7 @@
 .w60{ width:60%; } .w80{ width:80%; } .w90{ width:90%; }
 @keyframes shimmer{ from{ transform: translateX(-100%);} to{ transform: translateX(100%);} }
 
-/* Responsive */
+
 @media (max-width: 780px){
   .menu-icon{ display:block; }
   .nav-links{
@@ -217,21 +217,21 @@
   .dates-card .dates-grid{ grid-template-columns: 1fr; }
 }
 
-/* Animations */
+
 @keyframes fadeIn{ from{ opacity:0; transform: translateY(10px);} to{ opacity:1; transform: translateY(0);} }
 :focus-visible{ outline: 3px solid rgba(155, 140, 242, .34); outline-offset: 2px; }
 
 
 .song-detail-container .navbar{
-  position: static !important;   /* kill sticky/fixed from any global CSS */
+  position: static !important;
   top: auto !important;
   left: auto !important;
   right: auto !important;
   width: auto;
-  border-radius: 14px;           /* keep your rounded look */
+  border-radius: 14px;
 }
 
-/* In case you previously added padding for a fixed navbar: remove it here */
+
 .song-detail-container{
   padding-top: 20px !important;
 }

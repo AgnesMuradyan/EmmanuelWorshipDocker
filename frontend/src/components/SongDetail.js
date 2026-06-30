@@ -78,7 +78,6 @@ ${song.structure ? `\n\nStructure:\n${song.structure}` : ''}
     if (!song?.original_link) return;
     try {
       await navigator.clipboard.writeText(song.original_link);
-      // alert('Հղումը պատճենվեց․ ✅');
     } catch {
       alert('Չհաջողվեց պատճենել հղումը।');
     }
@@ -173,7 +172,7 @@ ${song.structure ? `\n\nStructure:\n${song.structure}` : ''}
               </section>
             )}
 
-            {/* НОՏԱՆԵՐ section with bigger title and buttons below it */}
+
             <section className="section card chords-card">
               <h2 className="section-title section-title-big">Նոտաներ</h2>
 
@@ -203,7 +202,7 @@ ${song.structure ? `\n\nStructure:\n${song.structure}` : ''}
               )}
             </section>
 
-            {/* Actions: first row with two buttons, second row with back link */}
+
             <section className="section card actions-card">
               <div className="actions-row-top">
                 <button className="btn" onClick={downloadPowerpoint}>Ներբեռնել սլայդը</button>
@@ -214,22 +213,22 @@ ${song.structure ? `\n\nStructure:\n${song.structure}` : ''}
               </div>
             </section>
 
-            {/*<section className="section card dates-card">*/}
-            {/*  <div className="dates-grid">*/}
-            {/*    {song.created_at && (*/}
-            {/*      <div className="date-item">*/}
-            {/*        <span className="date-label">Ստեղծվել է</span>*/}
-            {/*        <span className="date-value">{new Date(song.created_at).toLocaleDateString()}</span>*/}
-            {/*      </div>*/}
-            {/*    )}*/}
-            {/*    {song.updated_at && (*/}
-            {/*      <div className="date-item">*/}
-            {/*        <span className="date-label">Փոփոխվել է</span>*/}
-            {/*        <span className="date-value">{new Date(song.updated_at).toLocaleDateString()}</span>*/}
-            {/*      </div>*/}
-            {/*    )}*/}
-            {/*  </div>*/}
-            {/*</section>*/}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
           </>
         )}
       </div>

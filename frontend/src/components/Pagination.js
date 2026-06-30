@@ -1,14 +1,13 @@
-// src/components/Pagination.js
 import React, { useMemo, useCallback, useEffect, useState } from 'react';
 import './Pagination.css';
 
 const clamp = (n, min, max) => Math.max(min, Math.min(n, max));
 const range = (s, e) => Array.from({ length: e - s + 1 }, (_, i) => s + i);
 
-/** Build visible items (pages + ellipses) */
+
 function buildItems(totalPages, currentPage, { siblingCount = 1, boundaryCount = 1 } = {}) {
-  const totalNumbers = boundaryCount * 2 + siblingCount * 2 + 3; // first,last,current + 2 ellipses
-  const totalBlocks = totalNumbers + 2; // including ellipses
+  const totalNumbers = boundaryCount * 2 + siblingCount * 2 + 3;
+  const totalBlocks = totalNumbers + 2;
   if (totalPages <= totalBlocks) {
     return range(1, totalPages).map(n => ({ type: 'page', value: n }));
   }
@@ -23,7 +22,7 @@ function buildItems(totalPages, currentPage, { siblingCount = 1, boundaryCount =
   const rightItems = range(totalPages - boundaryCount + 1, totalPages).map(n => ({ type: 'page', value: n }));
   const middleItems = range(leftSibling, rightSibling).map(n => ({ type: 'page', value: n }));
 
-  const block = Math.max(1, siblingCount * 2 + 1); // jump size for ellipsis
+  const block = Math.max(1, siblingCount * 2 + 1);
 
   if (!showLeftDots && showRightDots) {
     const leftRange = range(1, boundaryCount + 2 + siblingCount * 2).map(n => ({ type: 'page', value: n }));
@@ -48,17 +47,16 @@ function buildItems(totalPages, currentPage, { siblingCount = 1, boundaryCount =
   ];
 }
 
-/** Small hook to track mobile breakpoint (no external file needed) */
+
 function useIsMobile(breakpoint = 480) {
-  const get = () => (typeof window !== 'undefined' ? window.innerWidth <= breakpoint : false);
+  const get = useCallback(() => (typeof window !== 'undefined' ? window.innerWidth <= breakpoint : false), [breakpoint]);
   const [isMobile, setIsMobile] = useState(get);
 
   useEffect(() => {
     const onResize = () => setIsMobile(get());
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [breakpoint]);
+  }, [get]);
 
   return isMobile;
 }
@@ -67,24 +65,22 @@ export default function Pagination({
   currentPage,
   totalPages,
   onPageChange,
-  /** desktop defaults */
+
   siblingCount = 1,
   boundaryCount = 1,
-  /** mobile tuning */
+
   compactOnMobile = true,
   mobileBreakpoint = 480,
   mobileSiblingCount = 0,
   mobileBoundaryCount = 1,
-  /** UI */
+
   className = '',
   ariaLabel = 'List pages',
   showTotal = false,
-  size = 'md', // 'sm' | 'md' | 'lg'
+  size = 'md',
 }) {
-  // Hooks must be before any early return
   const isMobile = useIsMobile(mobileBreakpoint);
 
-  // Choose effective counts based on screen size
   const effSibling = compactOnMobile && isMobile ? mobileSiblingCount : siblingCount;
   const effBoundary = compactOnMobile && isMobile ? mobileBoundaryCount : boundaryCount;
 
@@ -99,7 +95,7 @@ export default function Pagination({
   );
 
   const shouldHide = !totalPages || totalPages <= 1;
-  if (shouldHide) return null; // safe AFTER hooks
+  if (shouldHide) return null;
 
   const onKeyDown = (e) => {
     if (e.defaultPrevented) return;

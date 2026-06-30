@@ -1,5 +1,4 @@
-// src/components/PlanList.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './PlanList.css';
@@ -33,7 +32,7 @@ const dayTypeLabel = (code) => {
 
 const PlanList = () => {
   const [plans, setPlans] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(''); // YYYY-MM-DD
+  const [searchTerm, setSearchTerm] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDayType, setSelectedDayType] = useState('ALL');
 
@@ -42,33 +41,21 @@ const PlanList = () => {
   const [count, setCount] = useState(0);
   const totalPages = Math.ceil(count / plansPerPage);
 
-  // ui states
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrMsg] = useState('');
+  const filtersRef = useRef({ searchTerm: '', selectedDayType: 'ALL' });
 
   useEffect(() => {
-    fetchPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    filtersRef.current = { searchTerm, selectedDayType };
+  }, [searchTerm, selectedDayType]);
 
-  useEffect(() => {
-    const t = setTimeout(() => fetchPage(1), 300);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchTerm]);
-
-  useEffect(() => {
-    fetchPage(1);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDayType]);
-
-  const fetchPage = async (page) => {
+  const fetchPage = useCallback(async (page, filters = filtersRef.current) => {
     try {
       setLoading(true);
       setErrMsg('');
       const params = { page, page_size: plansPerPage, ordering: '-date' };
-      if (searchTerm) params.date = searchTerm;
-      if (selectedDayType !== 'ALL') params.day_type = selectedDayType;
+      if (filters.searchTerm) params.date = filters.searchTerm;
+      if (filters.selectedDayType !== 'ALL') params.day_type = filters.selectedDayType;
 
       const { data } = await axios.get(PLANS_CHOICES_URL, { params });
       setPlans(data.results || []);
@@ -82,17 +69,29 @@ const PlanList = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [plansPerPage]);
+
+  useEffect(() => {
+    fetchPage(1);
+  }, [fetchPage]);
+
+  useEffect(() => {
+    const t = setTimeout(() => fetchPage(1, filtersRef.current), 300);
+    return () => clearTimeout(t);
+  }, [fetchPage, searchTerm]);
+
+  useEffect(() => {
+    fetchPage(1, filtersRef.current);
+  }, [fetchPage, selectedDayType]);
 
   const handlePageChange = (pageNumber) => {
-    if (pageNumber !== currentPage) fetchPage(pageNumber);
+    if (pageNumber !== currentPage) fetchPage(pageNumber, filtersRef.current);
   };
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
   return (
     <div className="page-bg">
-      {/* subtle svg pattern */}
       <svg className="bg-pattern" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
@@ -128,13 +127,10 @@ const PlanList = () => {
 
         <header className="header-stack">
           <h1 className="song-title">Ծրագրեր</h1>
-          {/*<div className="chip-row">
-            <span className={`chip chip-type-${selectedDayType.toLowerCase()}`}>{headerChip}</span>
-            {searchTerm && <span className="chip chip-muted">Ամսաթիվ՝ {searchTerm}</span>}
-          </div>*/}
+
         </header>
 
-        {/* Filters */}
+
         <div className="controls sticky-controls" role="search">
           <div className="control-grid">
             <div className="input-wrap">
@@ -166,7 +162,7 @@ const PlanList = () => {
           </div>
         </div>
 
-        {/* ✅ Pagination placed directly under filters */}
+
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
@@ -181,7 +177,7 @@ const PlanList = () => {
           showTotal
         />
 
-        {/* Error */}
+
         {errMsg && (
           <div className="card error-card" role="alert">
             <div className="err-icon" aria-hidden>⚠️</div>
@@ -193,7 +189,7 @@ const PlanList = () => {
           </div>
         )}
 
-        {/* Loading skeletons */}
+
         {loading && !errMsg && (
           <ul className="plan-list">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -207,7 +203,7 @@ const PlanList = () => {
           </ul>
         )}
 
-        {/* Content */}
+
         {!loading && !errMsg && (
           <>
             {plans.length === 0 ? (

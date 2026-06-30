@@ -21,17 +21,14 @@ const CreatePlan = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch all musicians
     axios.get(`${API_BASE_URL}/api/musicians/`)
       .then(response => setAllMusicians(asList(response.data)))
       .catch(error => console.error('There was an error fetching the musicians!', error));
 
-    // Fetch all singers
     axios.get(`${API_BASE_URL}/api/singers/`)
       .then(response => setAllSingers(asList(response.data)))
       .catch(error => console.error('There was an error fetching the singers!', error));
 
-    // Fetch all songs
     axios.get(`${API_BASE_URL}/api/songs/`)
       .then(response => setAllSongs(asList(response.data)))
       .catch(error => console.error('There was an error fetching the songs!', error));
