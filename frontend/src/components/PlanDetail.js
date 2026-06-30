@@ -82,7 +82,6 @@ const PlanDetail = () => {
     );
   };
 
-  // ---- Derived, ordered sections
   const orderedLeadSingers = useMemo(() => {
     const arr = plan?.lead_singers_ordered ?? [];
     return arr.slice().sort((a, b) => a.order - b.order);
@@ -114,7 +113,7 @@ const PlanDetail = () => {
 
   return (
     <div className="page-bg">
-      {/* gradient + subtle dots */}
+
       <svg className="bg-pattern" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
@@ -146,7 +145,7 @@ const PlanDetail = () => {
           </div>
         </nav>
 
-        {/* Loading Skeleton */}
+
         {loading && (
           <div className="card skeleton-card">
             <div className="sk-title"></div>
@@ -158,7 +157,7 @@ const PlanDetail = () => {
           </div>
         )}
 
-        {/* Error */}
+
         {!loading && errMsg && (
           <div className="card error-card" role="alert">
             <div className="err-icon" aria-hidden>⚠️</div>
@@ -170,18 +169,18 @@ const PlanDetail = () => {
           </div>
         )}
 
-        {/* Content */}
+
         {!loading && !errMsg && plan && (
           <>
             <header className="header-stack">
               <h1 className="plan-date">{formatDateLong(plan.date)}</h1>
               <div className="chip-row">
                 <span className="chip chip-type">{dayTypeChip}</span>
-                {/*<span className="chip muted">ID՝ {plan.id}</span>*/}
+
               </div>
             </header>
 
-            {/* Leaders */}
+
             <section className="section card">
               <div className="section-title-row">
                 <h2 className="section-title">Վարողներ</h2>
@@ -203,7 +202,7 @@ const PlanDetail = () => {
               )}
             </section>
 
-            {/* Vocals */}
+
             <section className="section card">
               <div className="section-title-row">
                 <h2 className="section-title">Վոկալ</h2>
@@ -222,7 +221,7 @@ const PlanDetail = () => {
               )}
             </section>
 
-            {/* Choir */}
+
             <section className="section card">
               <div className="section-title-row">
                 <h2 className="section-title">Երգչախումբ</h2>
@@ -241,7 +240,7 @@ const PlanDetail = () => {
               )}
             </section>
 
-            {/* Musicians */}
+
             <section className="section card">
               <div className="section-title-row">
                 <h2 className="section-title">Երաժիշտներ</h2>
@@ -260,7 +259,7 @@ const PlanDetail = () => {
               )}
             </section>
 
-            {/* Songs (ordered) */}
+
             <section className="section card">
               <div className="section-title-row">
                 <h2 className="section-title">Երգեր</h2>
@@ -287,7 +286,7 @@ const PlanDetail = () => {
               )}
             </section>
 
-            {/* Actions */}
+
             <section className="section actions-card">
               <div className="actions-row-top">
                 <button className="btn" onClick={downloadConcatenatedPowerpoint}>

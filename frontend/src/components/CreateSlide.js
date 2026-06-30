@@ -1,4 +1,3 @@
-// src/components/CreateSlide.jsx
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './SongList.css';
@@ -6,8 +5,8 @@ import logo from './logo.png';
 import { API_BASE_URL } from '../config/api';
 
 const CREATE_SLIDE_URL = `${API_BASE_URL}/api/create_slide_dl/`;
-const MAX_TEXT_LEN = 15000;           // keep headroom for URL length
-const SAFE_URL_LEN = 8000;            // warn if the final URL might exceed common limits
+const MAX_TEXT_LEN = 15000;
+const SAFE_URL_LEN = 8000;
 
 export default function CreateSlide() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -25,7 +24,7 @@ export default function CreateSlide() {
     setErrMsg('');
     setOkMsg('');
 
-    const q = new URLSearchParams({ text }).toString();   // safely encodes newlines etc.
+    const q = new URLSearchParams({ text }).toString();
     const url = `${CREATE_SLIDE_URL}?${q}`;
 
     if (url.length > SAFE_URL_LEN) {
@@ -33,10 +32,9 @@ export default function CreateSlide() {
       return;
     }
 
-    // Navigate to the URL -> browser downloads the PPTX (no CORS/CSRF/cookies)
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.setAttribute('download', 'slides.pptx'); // hint; server sets real name
+    anchor.setAttribute('download', 'slides.pptx');
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -46,7 +44,6 @@ export default function CreateSlide() {
 
   return (
     <div className="page-bg">
-      {/* background */}
       <svg className="bg-pattern" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
@@ -63,7 +60,6 @@ export default function CreateSlide() {
       </svg>
 
       <div className="song-list-container glass">
-        {/* Navbar like SongList */}
         <nav className="navbar">
           <div className="navbar-brand">
             <img src={logo} alt="EmmanuelWorship Logo" className="logo" />
@@ -85,7 +81,7 @@ export default function CreateSlide() {
           </div>
         </nav>
 
-        {/* Header */}
+
         <header className="header-stack">
           <h1 className="song-title">Ստեղծել սլայդ</h1>
           <div className="chip-row">
@@ -94,7 +90,7 @@ export default function CreateSlide() {
           </div>
         </header>
 
-        {/* Form */}
+
         <form onSubmit={doDownload}>
           <div className="controls sticky-controls" role="search">
             <div className="control-grid">
@@ -116,7 +112,7 @@ export default function CreateSlide() {
             </div>
           </div>
 
-          {/* Actions */}
+
           <div className="controls" style={{ marginTop: 10 }}>
             <button type="submit" className="btn" disabled={!text.trim()} style={{ marginRight: 10 }}>
               Ստեղծել և ներբեռնել PPTX
@@ -132,7 +128,7 @@ export default function CreateSlide() {
           </div>
         </form>
 
-        {/* Messages */}
+
         {errMsg && (
           <div className="card error-card" role="alert" style={{ marginTop: 16 }}>
             <div className="err-icon" aria-hidden>⚠️</div>

@@ -1,6 +1,4 @@
-/* =========================
-   THEME (matches other pages)
-   ========================= */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Serif+Armenian:wght@600;700&display=swap');
 
 :root{
@@ -48,11 +46,11 @@ html, body{
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
 
-/* Background gradient pattern */
+
 .page-bg{ position: relative; min-height:100vh; overflow-x:hidden; }
 .bg-pattern{ position: fixed; inset:0; width:100%; height:100%; z-index:-1; }
 
-/* Container with glass */
+
 .plan-detail-container{
   max-width: 980px; margin: 32px auto 48px; padding: 20px;
 }
@@ -69,9 +67,7 @@ html, body{
   background: linear-gradient(90deg, #ded6ff, #b9a7f7, #b4a4f5);
 }
 
-/* =========================
-   NAVBAR
-   ========================= */
+
 .navbar{
   display:flex; justify-content:space-between; align-items:center;
   background: linear-gradient(135deg, #5f4b7a, #b4a4f5 62%, #b9a7f7);
@@ -86,9 +82,7 @@ html, body{
 .nav-link{ color:#fff; text-decoration:none; font-weight:700; padding:8px 12px; border-radius:10px; transition:.25s; }
 .nav-link:hover, .nav-link:focus-visible{ background-color: rgba(255,255,255,.17); outline:none; }
 
-/* =========================
-   HEADER
-   ========================= */
+
 .header-stack{ display:grid; gap:10px; align-items:center; }
 .plan-date{
   font-family:'Noto Serif Armenian', serif;
@@ -108,9 +102,7 @@ html, body{
 .chip-type{ background:var(--ew-sky, #f1edff); color:#6f5a9a; border-color:#ebe5ff; }
 .chip.muted{ color: var(--c-muted); }
 
-/* =========================
-   SECTIONS & CARDS
-   ========================= */
+
 .section{ margin-top: 16px; }
 .card{
   background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(250,247,255,.9));
@@ -124,7 +116,7 @@ html, body{
 }
 .section-title-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
 
-/* People: leaders list (vertical) */
+
 .people-list{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
 .person{
   display:flex; gap:10px; align-items:center;
@@ -145,7 +137,7 @@ html, body{
 .person-name{ font-weight:800; color:#2f2540; }
 .person-sub{ font-size:.85rem; color: #6d5a8d; }
 
-/* People: singers/musicians grid */
+
 .people-grid{ list-style:none; margin:0; padding:0; display:grid; gap:10px; grid-template-columns: repeat(3, minmax(0,1fr)); }
 .person-tile{
   display:flex; align-items:center; gap:8px;
@@ -159,7 +151,7 @@ html, body{
 .avatar.sm{ min-width:38px; min-height:38px; border-radius:10px; }
 .tile-name{ font-weight:700; color:#2f2540; }
 
-/* Songs (ordered list) */
+
 .song-ordered{ counter-reset: song; list-style:none; margin:0; padding:0; display:grid; gap:10px; }
 .song-row{
   display:grid; grid-template-columns: 56px 1fr; align-items:center; gap:12px;
@@ -186,7 +178,7 @@ html, body{
 .meta-chip.key{ background:var(--ew-mint, #f6f1ff); color:#7c6496; }
 .meta-chip.album{ background:var(--ew-rose, #faf7ff); color:#6d5a8d; }
 
-/* Actions (base button styles) */
+
 .btn{
   background: linear-gradient(135deg, #8d7ae6, #6d5a8d); color:#fff; border:1px solid rgba(255,255,255,.32);
   padding:11px 16px; border-radius:12px; cursor:pointer; font-weight:800; transition:.2s;
@@ -208,7 +200,7 @@ html, body{
 }
 .btn-ghost:hover{ background:#fff; color:#4f3c6c; }
 
-/* Empty & Error */
+
 .empty{
   text-align:center; padding:24px; background: var(--c-soft);
   border-radius:12px; border:1px solid var(--c-border);
@@ -223,7 +215,7 @@ html, body{
 }
 .err-icon{ font-size:1.6rem; }
 
-/* Skeleton */
+
 .skeleton-card{ position:relative; overflow:hidden; min-height: 140px; }
 .skeleton-card::after{
   content:""; position:absolute; inset:0;
@@ -236,7 +228,7 @@ html, body{
 .w60{ width:60%; } .w80{ width:80%; } .w90{ width:90%; }
 @keyframes shimmer{ from{ transform: translateX(-100%);} to{ transform: translateX(100%);} }
 
-/* Responsive */
+
 @media (max-width: 900px){ .people-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
 @media (max-width: 780px){
   .menu-icon{ display:block; }
@@ -250,15 +242,13 @@ html, body{
   .avatar{ min-width:40px; min-height:40px; }
 }
 
-/* A11y & Animations */
+
 @keyframes fadeIn{ from{ opacity:0; transform: translateY(10px);} to{ opacity:1; transform: translateY(0);} }
 :focus-visible{ outline: 3px solid color-mix(in oklab, var(--c-primary-1) 35%, transparent); outline-offset: 2px; }
 
-/* =======================================================
-   ACTIONS LAYOUT (two buttons centered, back link below)
-   ======================================================= */
 
-/* Container for actions; column to allow a second row */
+
+
 .section.actions-card{
   display: flex;
   flex-direction: column;
@@ -271,7 +261,7 @@ html, body{
   padding: 16px;
 }
 
-/* Top row: keep two buttons on one centered line on desktop */
+
 .section.actions-card .actions-row-top{
   display: grid;
   grid-auto-flow: column;
@@ -281,21 +271,21 @@ html, body{
   width: 100%;
 }
 
-/* Back link row: centered */
+
 .section.actions-card .actions-row-bottom{
   display: flex;
   justify-content: center;
   margin-top: 8px;
 }
 
-/* Ensure no stray margins push items to the right */
+
 .section.actions-card .actions-row-top > *,
 .section.actions-card .actions-row-bottom > *{
   margin: 0;
   justify-self: center;
 }
 
-/* Mobile: stack buttons but keep centered and tidy */
+
 @media (max-width: 600px){
   .section.actions-card .actions-row-top{
     grid-auto-flow: row;
@@ -306,7 +296,7 @@ html, body{
   }
 }
 
-/* Hard-centering guardrails in case of inherited right alignment */
+
 .section.actions-card,
 .section.actions-card .actions-row-top,
 .section.actions-card .actions-row-bottom{

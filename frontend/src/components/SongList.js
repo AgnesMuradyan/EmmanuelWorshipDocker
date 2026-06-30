@@ -1,4 +1,3 @@
-// src/components/SongList.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
@@ -49,7 +48,6 @@ const SongList = () => {
 
   useEffect(() => { fetchPage(1, ''); }, []);
 
-  // Debounce search
   useEffect(() => {
     const t = setTimeout(() => fetchPage(1, searchTerm), 300);
     return () => clearTimeout(t);
@@ -63,7 +61,7 @@ const SongList = () => {
 
   return (
     <div className="page-bg">
-      {/* Subtle gradient + dots */}
+
       <svg className="bg-pattern" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
         <defs>
           <linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
@@ -104,7 +102,7 @@ const SongList = () => {
           )}
         </header>
 
-        {/* Sticky search */}
+
         <div className="controls sticky-controls" role="search">
           <div className="control-grid">
             <div className="input-wrap">
@@ -122,7 +120,7 @@ const SongList = () => {
           </div>
         </div>
 
-        {/* ✅ Pagination directly under search controls */}
+
         {totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
@@ -139,7 +137,7 @@ const SongList = () => {
           />
         )}
 
-        {/* Error */}
+
         {errMsg && (
           <div className="card error-card" role="alert">
             <div className="err-icon" aria-hidden>⚠️</div>
@@ -151,7 +149,7 @@ const SongList = () => {
           </div>
         )}
 
-        {/* Loading skeletons */}
+
         {loading && !errMsg && (
           <ul className="song-list">
             {Array.from({ length: 8 }).map((_, i) => (
@@ -168,7 +166,7 @@ const SongList = () => {
           </ul>
         )}
 
-        {/* Content */}
+
         {!loading && !errMsg && (
           <>
             {songs.length === 0 ? (

@@ -1,9 +1,9 @@
-/* Theming via CSS variables */
+
 .pg-root {
-  --pg-bg: #e0e0e0;        /* bright gray background */
-  --pg-bg-hover: #cfcfcf;  /* slightly darker on hover */
-  --pg-fg: #222;           /* dark text for contrast */
-  --pg-ghost: #666;        /* medium gray for ghost/ellipsis */
+  --pg-bg: #e0e0e0;
+  --pg-bg-hover: #cfcfcf;
+  --pg-fg: #222;
+  --pg-ghost: #666;
   --pg-focus-outer: rgba(0,0,0,.25);
   --pg-focus-inner: #999;
 
@@ -28,7 +28,7 @@
   padding: 0;
 }
 
-/* Arrows + numbers share the same look */
+
 .pg-btn,
 .pg-num,
 .pg-ellipsis-btn {
@@ -56,14 +56,14 @@
   transform: translateY(1px);
 }
 
-/* Current page */
+
 .pg-num.active {
   background: var(--pg-bg-hover);
   box-shadow: 0 0 0 2px var(--pg-focus-outer) inset;
   font-weight: 700;
 }
 
-/* Ellipsis presented as a small ghost pill */
+
 .pg-ellipsis-btn {
   background: transparent;
   color: var(--pg-ghost);
@@ -72,13 +72,13 @@
 }
 .pg-ellipsis { padding: 0; }
 
-/* Disabled arrows */
+
 .pg-btn:disabled {
   opacity: .5;
   cursor: not-allowed;
 }
 
-/* Keyboard focus ring */
+
 .pg-btn:focus-visible,
 .pg-num:focus-visible,
 .pg-ellipsis-btn:focus-visible {
@@ -88,7 +88,7 @@
     0 0 0 2px var(--pg-focus-inner) inset;
 }
 
-/* Compact on small screens */
+
 @media (max-width: 480px) {
   .pg-btn, .pg-num, .pg-ellipsis-btn {
     padding: 8px 10px;
@@ -96,22 +96,22 @@
   }
 }
 
-/* Ultra narrow: hide double arrows (keep prev/next) */
+
 @media (max-width: 360px) {
-  .pg-root > .pg-btn:first-of-type,    /* « */
-  .pg-root > .pg-btn:last-of-type {    /* » */
+  .pg-root > .pg-btn:first-of-type,
+  .pg-root > .pg-btn:last-of-type {
     display: none;
   }
 }
 
-/* Reduced motion */
+
 @media (prefers-reduced-motion: reduce) {
   .pg-btn, .pg-num, .pg-ellipsis-btn {
     transition: none;
   }
 }
 
-/* Optional total indicator */
+
 .pg-total {
   color: var(--pg-ghost);
   font-weight: 700;

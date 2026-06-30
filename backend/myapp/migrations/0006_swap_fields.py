@@ -1,4 +1,3 @@
-# 0006_swap_fields.py
 from django.db import migrations
 
 class Migration(migrations.Migration):

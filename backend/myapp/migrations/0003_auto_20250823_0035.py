@@ -1,4 +1,3 @@
-# 0003_create_planleadsinger.py
 from django.db import migrations, models
 import django.db.models.deletion
 from django.db.models import UniqueConstraint

@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import create_slide_dl  # make sure this is the right import
+from .views import create_slide_dl
 from rest_framework.routers import DefaultRouter
 from .views import (
     AlbumViewSet, SongViewSet, InstrumentViewSet, MusicianViewSet,
@@ -17,6 +17,6 @@ router.register(r'plans', PlanViewSet)
 router.register(r'plansongs', PlanSongViewSet)
 
 urlpatterns = [
-    path('create_slide_dl/', create_slide_dl, name='create_slide_dl'),  # <-- put BEFORE include(router.urls)
+    path('create_slide_dl/', create_slide_dl, name='create_slide_dl'),
     path('', include(router.urls)),
 ]

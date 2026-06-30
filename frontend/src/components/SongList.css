@@ -1,6 +1,4 @@
-/* =========================
-   THEME & BASICS
-   ========================= */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Noto+Serif+Armenian:wght@600;700&display=swap');
 
 :root{
@@ -44,11 +42,11 @@ html, body {
   -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
 }
 
-/* Background gradient pattern */
+
 .page-bg{ position: relative; min-height:100vh; overflow-x:hidden; }
 .bg-pattern{ position: fixed; inset:0; width:100%; height:100%; z-index:-1; }
 
-/* Container with glass */
+
 .song-list-container{
   max-width: 980px; margin: 32px auto 48px; padding: 20px;
 }
@@ -65,9 +63,7 @@ html, body {
   background: linear-gradient(90deg, #ded6ff, #b9a7f7, #b4a4f5);
 }
 
-/* =========================
-   NAVBAR
-   ========================= */
+
 .navbar{
   display:flex; justify-content:space-between; align-items:center;
   background: linear-gradient(135deg, #5f4b7a, #b4a4f5 62%, #b9a7f7);
@@ -82,9 +78,7 @@ html, body {
 .nav-link{ color:#fff; text-decoration:none; font-weight:700; padding:8px 12px; border-radius:10px; transition:.25s; }
 .nav-link:hover, .nav-link:focus-visible{ background-color: rgba(255,255,255,.17); outline:none; }
 
-/* =========================
-   HEADER
-   ========================= */
+
 .song-title{
   font-family:'Noto Serif Armenian', serif;
   font-size: clamp(1.8rem, 1.4rem + 2vw, 2.6rem);
@@ -103,9 +97,7 @@ html, body {
 }
 .chip-muted{ color: var(--c-muted); }
 
-/* =========================
-   CONTROLS (sticky search)
-   ========================= */
+
 .controls{ position: sticky; top: 86px; z-index:40; }
 .sticky-controls{ padding:10px 12px; backdrop-filter: blur(6px); }
 .control-grid{
@@ -115,7 +107,7 @@ html, body {
   border: 1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
 }
 
-/* Search */
+
 .input-wrap{ width:100%; }
 .search-input{
   width:100%; padding:12px 14px; border:1.6px solid rgba(155, 140, 242, 0.24);
@@ -126,9 +118,7 @@ html, body {
   box-shadow: 0 0 0 5px color-mix(in oklab, var(--c-primary-1) 20%, transparent);
 }
 
-/* =========================
-   LIST & CARDS
-   ========================= */
+
 .song-list{ list-style:none; margin:18px 0 0; padding:0; display:grid; gap:12px; }
 .song-item{ margin:0; }
 
@@ -145,7 +135,7 @@ html, body {
   border-color: rgba(192, 38, 211, 0.32);
 }
 
-/* avatar with letter */
+
 .note-avatar{
   display:flex; align-items:center; justify-content:center;
   background: linear-gradient(160deg, #9b8cf2, var(--ew-coral, #b4a4f5));
@@ -165,9 +155,7 @@ html, body {
 .album-chip{ background:var(--ew-rose, #faf7ff); color:#7c6496; }
 .meta-link{ font-size:.9rem; color: var(--c-primary-1); opacity:.9; }
 
-/* =========================
-   SKELETONS
-   ========================= */
+
 .skeleton{
   display:grid; grid-template-columns: 64px 1fr; gap:14px; padding:12px 14px;
   background: color-mix(in oklab, var(--c-card) 85%, transparent);
@@ -189,9 +177,7 @@ html, body {
   to{ transform: translateX(100%); }
 }
 
-/* =========================
-   EMPTY & ERROR
-   ========================= */
+
 .empty{
   text-align:center; padding:40px 16px; background: color-mix(in oklab, var(--c-card) 80%, transparent);
   border-radius:16px; border:1px solid color-mix(in oklab, var(--c-card) 85%, transparent);
@@ -211,9 +197,7 @@ html, body {
 }
 .btn:hover{ filter: brightness(1.05); }
 
-/* =========================
-   PAGINATION
-   ========================= */
+
 .pagination{
   display:flex; justify-content:center; margin-top: 26px; gap: 10px; flex-wrap: wrap;
 }
@@ -224,9 +208,7 @@ html, body {
 .page-button:hover, .page-button:focus-visible{ background: var(--c-primary-1); outline:none; }
 .page-button.active{ background: linear-gradient(135deg, #b9a7f7, #b4a4f5); }
 
-/* =========================
-   RESPONSIVE
-   ========================= */
+
 @media (max-width: 780px){
   .menu-icon{ display:block; }
   .nav-links{
@@ -237,9 +219,7 @@ html, body {
   .nav-links.active{ display:flex; }
 }
 
-/* =========================
-   ACCESSIBILITY & ANIMATIONS
-   ========================= */
+
 .sr-only{
   position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0);
   white-space:nowrap; border:0;

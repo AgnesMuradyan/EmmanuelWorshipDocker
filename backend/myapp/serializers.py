@@ -1,12 +1,23 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import serializers
-from .models import (
-    Album, Song, Member, Instrument, Musician, MusicianInstrument, Singer, Plan, PlanSong, PlanLeadSinger
-)
-from django import forms
 import logging
 
+from django import forms
+from rest_framework import serializers
+
+from .models import (
+    Album,
+    Instrument,
+    Member,
+    Musician,
+    MusicianInstrument,
+    Plan,
+    PlanLeadSinger,
+    PlanSong,
+    Singer,
+    Song,
+)
+
 logger = logging.getLogger(__name__)
+
 
 class AlbumSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,9 +36,6 @@ class SongSerializer(serializers.ModelSerializer):
     class Meta:
         model = Song
         fields = '__all__'
-        # widgets = {
-        #     'chords': forms.FileInput(),
-        # }
 
     def save(self, commit=True):
         instance = super(SongSerializer, self).save(commit=False)
@@ -77,7 +85,7 @@ class MemberSerializer(serializers.ModelSerializer):
 class PlanSongSerializer(serializers.ModelSerializer):
     plan_date = serializers.DateField(source='plan.date', read_only=True)
     song_title = serializers.CharField(source='song.title', read_only=True)
-    song_id = serializers.IntegerField(source='song.id')  # Fetch the song ID from the related Song instance
+    song_id = serializers.IntegerField(source='song.id')
 
     class Meta:
         model = PlanSong
@@ -85,8 +93,8 @@ class PlanSongSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         song_id = validated_data.pop('song')['id']
-        song = Song.objects.get(id=song_id)  # Fetch the actual song instance
-        validated_data['song'] = song  # Use the song instance instead of the ID
+        song = Song.objects.get(id=song_id)
+        validated_data['song'] = song
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
@@ -208,4 +216,3 @@ class PlanChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plan
         fields = ("id", "date", "day_type")
-
