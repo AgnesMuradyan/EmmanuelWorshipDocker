@@ -1,5 +1,6 @@
 import re
 
+from asgiref.sync import sync_to_async
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.templatetags.static import static
@@ -16,14 +17,14 @@ def _desc_from_verse(verse: str | None, limit: int = 200) -> str:
     flat = flat[:limit]
     return escape(flat)
 
-def song_share(request, pk: int):
+async def song_share(request, pk: int):
     ua = (request.META.get("HTTP_USER_AGENT") or "").lower()
     is_bot = any(s in ua for s in BOT_UA)
 
     if not is_bot:
-        return render(request, "index.html")
+        return await sync_to_async(render)(request, "index.html")
 
-    song = Song.objects.filter(pk=pk).first()
+    song = await sync_to_async(lambda: Song.objects.filter(pk=pk).first())()
     url  = request.build_absolute_uri()
     img  = request.build_absolute_uri(static("img/share-default.jpg"))
 

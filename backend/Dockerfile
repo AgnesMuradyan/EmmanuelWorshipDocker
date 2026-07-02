@@ -17,4 +17,4 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "uv run --no-sync python manage.py migrate && uv run --no-sync python manage.py runserver 0.0.0.0:8000"]
+CMD ["sh", "-c", "uv run --no-sync python manage.py migrate && uv run --no-sync uvicorn backend.asgi:application --host 0.0.0.0 --port 8000"]
