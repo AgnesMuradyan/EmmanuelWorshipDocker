@@ -1,9 +1,9 @@
 from io import BytesIO
 from unicodedata import normalize
 
-from django.http import HttpResponse
+from asgiref.sync import sync_to_async
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.shortcuts import render
-from django.views.decorators.http import require_GET
 from docx import Document
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -26,8 +26,8 @@ from .serializers import (
 )
 
 
-def index(request):
-    return render(request, 'index.html')
+async def index(request):
+    return await sync_to_async(render)(request, 'index.html')
 
 
 class AlbumViewSet(viewsets.ModelViewSet):
@@ -302,8 +302,7 @@ class PlanSongViewSet(viewsets.ModelViewSet):
     serializer_class = PlanSongSerializer
 
 
-@require_GET
-def create_slide_dl(request):
+def _create_slide_dl_response(request):
     try:
         text = request.GET.get("text", "")
 
@@ -487,3 +486,9 @@ def create_slide_dl(request):
 
     except Exception as e:
         return HttpResponse(f"Error: {e}", status=500, content_type="text/plain; charset=utf-8")
+
+
+async def create_slide_dl(request):
+    if request.method != "GET":
+        return HttpResponseNotAllowed(["GET"])
+    return await sync_to_async(_create_slide_dl_response, thread_sensitive=False)(request)
