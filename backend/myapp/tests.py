@@ -1,8 +1,11 @@
 from django.test import TestCase
+from django.test import override_settings
+from unittest.mock import patch
 from rest_framework.test import APIClient
 
 from .models import Album, Musician, Plan, PlanLeadSinger, PlanSong, Singer, Song
 from .serializers import PlanSerializer
+from .telegram import send_telegram_message
 
 
 class PlanSerializerTests(TestCase):
@@ -82,3 +85,47 @@ class SongChoicesApiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]["title"], "Beta Song")
+
+
+class TelegramNotificationTests(TestCase):
+    @override_settings(
+        TELEGRAM_BOT_TOKEN="token",
+        TELEGRAM_CHANNEL_ID="@channel",
+        TELEGRAM_NOTIFICATIONS_ENABLED=True,
+    )
+    @patch("myapp.telegram.httpx.post")
+    def test_send_telegram_message_posts_to_bot_api(self, post):
+        post.return_value.raise_for_status.return_value = None
+
+        self.assertTrue(send_telegram_message("Song changed"))
+
+        post.assert_called_once_with(
+            "https://api.telegram.org/bottoken/sendMessage",
+            json={
+                "chat_id": "@channel",
+                "text": "Song changed",
+                "disable_web_page_preview": True,
+            },
+            timeout=5,
+        )
+
+    @override_settings(TELEGRAM_BOT_TOKEN="", TELEGRAM_CHANNEL_ID="", TELEGRAM_NOTIFICATIONS_ENABLED=True)
+    @patch("myapp.telegram.httpx.post")
+    def test_send_telegram_message_skips_without_configuration(self, post):
+        self.assertFalse(send_telegram_message("Song changed"))
+        post.assert_not_called()
+
+    @override_settings(
+        TELEGRAM_BOT_TOKEN="token",
+        TELEGRAM_CHANNEL_ID="@channel",
+        TELEGRAM_NOTIFICATIONS_ENABLED=True,
+    )
+    @patch("myapp.signals.send_telegram_message")
+    def test_model_save_sends_change_notification_after_commit(self, send_message):
+        with self.captureOnCommitCallbacks(execute=True):
+            Album.objects.create(title="Worship")
+
+        self.assertEqual(send_message.call_count, 1)
+        message = send_message.call_args.args[0]
+        self.assertIn("Added: Album", message)
+        self.assertIn("Object: Worship", message)

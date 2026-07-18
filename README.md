@@ -68,3 +68,15 @@ Frontend linting uses the React Scripts ESLint setup from `frontend/package.json
 Backend tests use Django's test runner. The Makefile supplies a SQLite `DATABASE_URL` and safe local environment values so the tests do not require Postgres.
 
 Frontend tests use Jest and React Testing Library.
+
+## Telegram Notifications
+
+Set these backend environment variables to send change notifications to a Telegram channel:
+
+```bash
+TELEGRAM_BOT_TOKEN=123456:your-bot-token
+TELEGRAM_CHANNEL_ID=@your_channel
+TELEGRAM_NOTIFICATIONS_ENABLED=True
+```
+
+Add the bot to the channel and give it permission to post messages. Leave either token or channel empty to disable notifications without changing code.
