@@ -5,4 +5,4 @@ class MyappConfig(AppConfig):
     name = 'myapp'
 
     def ready(self):
-        pass
+        import myapp.signals  # noqa: F401
